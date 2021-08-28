@@ -1,10 +1,21 @@
 {
-  "name": "worldscapes-engine",
+  "name": "@worldscapes/engine",
+  "main": "./index.js",
+  "exports": "./index.js",
+  "type": "commonjs",
   "version": "0.0.1",
   "description": "Declarative abstraction layer over Babylon.js",
-  "main": "./lib/public_api.js",
-  "type": "module",
+  "keywords": [
+    "babylonjs",
+    "worldscapes"
+  ],
+  "author": "Siarhei Filinski (sfilisnky@gmail.com)",
+  "license": "ISC",
   "scripts": {
+    "clear": "del-cli --force ./lib",
+    "build:docs": "typedoc",
+    "start": "nodemon",
+    "start:clean": "npm run clear && npm run start",
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint . --ext .ts --f table",
@@ -14,30 +25,29 @@
     "preversion": "npm run lint",
     "version": "npm run format && git add -A src"
   },
-  "keywords": [
-    "babylonjs",
-    "worldscapes"
-  ],
-  "author": "Siarhei Filinski (sfilisnky@gmail.com)",
-  "license": "ISC",
   "dependencies": {
-    "babylonjs": "^5.0.0-alpha.24",
+    "@types/node": "^15.12.2",
     "babylonjs-loaders": "^5.0.0-alpha.24",
-    "husky": "^6.0.0"
+    "cannon": "^0.6.2",
+    "del-cli": "^4.0.0",
+    "rxjs": "^7.1.0"
+  },
+  "peerDependencies": {
+    "babylonjs": "^5.0.0-alpha.24"
   },
   "devDependencies": {
-    "@types/node": "^15.12.2",
     "@typescript-eslint/eslint-plugin": "^4.26.1",
     "@typescript-eslint/parser": "^4.26.1",
     "eslint": "^7.28.0",
+    "husky": "^6.0.0",
+    "nodemon": "^2.0.7",
     "prettier": "^2.3.1",
-    "typescript": "^4.3.2",
-    "husky": "^6.0.0"
+    "typedoc": "^0.21.2",
+    "typescript": "^4.3.2"
   },
   "husky": {
     "hooks": {
       "pre-commit": "npm run lint && npm run format"
     }
-  },
-  "exports": "./lib/public_api.js"
+  }
 }

@@ -1,15 +1,16 @@
 {
   "compilerOptions": {
     "baseUrl": ".",
-    "target": "es6",
     "outDir": "./lib",
-    "module": "commonjs",
+    "target": "ES6",
+    "module": "CommonJS",
     "declaration": true,
     "noImplicitAny": false,
     "noEmitOnError": true,
     "removeComments": false,
     "sourceMap": true,
-    "strict": true
+    "strict": true,
+    "moduleResolution": "Node"
   },
   "include": [
     "src"
@@ -19,5 +20,10 @@
   ],
   "types": [
     "babylonjs"
-  ]
+  ],
+  "typedocOptions": {
+    "entryPoints": ["src/core.ts"],
+    "out": "docs/typedoc",
+    "theme": "minimal"
+  }
 }
