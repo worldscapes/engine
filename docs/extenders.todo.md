@@ -20,8 +20,9 @@
 
 
 
--- TODO --  
-- Extender should be built only di provided all required arguments  
+-- TODO --
+
+- Extender should be built only when di provided all required arguments  
 
 - Add ways to identify Entity, Extender type and ExtenderBuilder instance  
 
@@ -41,6 +42,6 @@ Extender users can subscribe to updates
 
 - Consistent events order(?)  
 
-- Make injectors to use observables under the hood  
+- Make so injectors use observables under the hood  
 
 - Extender count on entity (unique, n, many)  

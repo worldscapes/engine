@@ -1,9 +1,10 @@
-import {AssetsManager, Mesh, MeshAssetTask, MeshBuilder, Scene, Sound, TransformNode} from "babylonjs";
+import {AssetsManager, Mesh, MeshAssetTask, MeshBuilder, Scene, SceneLoader, Sound, TransformNode} from "babylonjs";
 import {NoAssetFoundError} from "../error/custom-errors/no-asset-found.error";
 import {SystemDescription, SystemInstance} from "../system";
 import {ISoundOptions} from "babylonjs/Audio/Interfaces/ISoundOptions";
-import {Resolver} from "../../shared/resolver";
+import {Resolver} from "../../shared/classes/resolver";
 import {EngineSystem, EngineSystemImpl} from "../engine/engine.system";
+import {getClassName} from "../../shared/functions/get-class-name";
 
 /**
  * @example process.env.PUBLIC_URL + "/assets/mesh/OBJ/"
@@ -12,7 +13,7 @@ export type AssetUrl = string;
 export type ModelAssetName = string;
 export type SoundAssetName = ModelAssetName;
 export type AssetName = ModelAssetName;
-export type AssetConfig = {
+export type  AssetConfig = {
     modelAssets: Record<AssetName, { url: AssetUrl, fileName: string }>,
     audioAssets: Record<AssetName, { url: AssetUrl, fileName: string, options: ISoundOptions }>,
 }
@@ -21,6 +22,16 @@ export class AssetSystemConfig {
     assetConfig?: AssetConfig = undefined;
 }
 
+
+/**
+ * Asset system should:
+ * - be able to load assets when app starts and dynamically in runtime
+ * - be able to load models with all related resources by name
+ * - be able to load data from url and locally
+ * - be able to load different data types independently
+ * - create asset instances via instantiation and cloning
+ * - prepare all resources before usage and then provide them by request
+ */
 export class AssetSystemImpl extends SystemInstance<AssetSystemImpl, AssetSystemConfig> {
 
     readonly AssetRootNodeName = "assets_root";
@@ -32,7 +43,7 @@ export class AssetSystemImpl extends SystemInstance<AssetSystemImpl, AssetSystem
     engineSystem!: EngineSystemImpl;
 
     protected async initialize() {
-        this.engineSystem = this.provider.getInjectedSystem(EngineSystem);
+        this.engineSystem = this.provider.getSystem(EngineSystem);
 
         this.assetManager = new AssetsManager(this.engineSystem.getBabylonScene());
 
@@ -40,12 +51,14 @@ export class AssetSystemImpl extends SystemInstance<AssetSystemImpl, AssetSystem
     }
 
     protected async loadResources(scene: Scene): Promise<void> {
+        SceneLoader.ShowLoadingScreen = true;
         await this.loadSounds(scene);
         await this.loadModels(scene);
+        SceneLoader.ShowLoadingScreen = false;
     }
 
     protected async loadModels(scene: Scene): Promise<void> {
-        const {assetConfig} = this.provider.getInjectConfig();
+        const {assetConfig} = this.provider.getConfig();
         const tasks = Object.entries(assetConfig.modelAssets).reduce((acc, [key, value]) =>
                 ({
                     ...acc,
@@ -71,7 +84,7 @@ export class AssetSystemImpl extends SystemInstance<AssetSystemImpl, AssetSystem
     }
 
     protected async loadSounds(scene: Scene): Promise<void> {
-        const { audioAssets } = this.provider.getInjectConfig().assetConfig;
+        const { audioAssets } = this.provider.getConfig().assetConfig;
         let assetCounter = 0;
         let totalCount = Object.keys(audioAssets).length;
 
@@ -88,6 +101,7 @@ export class AssetSystemImpl extends SystemInstance<AssetSystemImpl, AssetSystem
                     assetCounter += 1;
 
                     if (assetCounter === totalCount) {
+                        console.log(`[${getClassName(this)}]: All sounds were loaded`)
                         resolver.resolve();
                     }
                 },
@@ -99,6 +113,9 @@ export class AssetSystemImpl extends SystemInstance<AssetSystemImpl, AssetSystem
     }
 
     createLines = MeshBuilder.CreateLines;
+    createLineSystem = MeshBuilder.CreateLineSystem;
+    createPlane = MeshBuilder.CreatePlane;
+    createTiledPlane = MeshBuilder.CreateTiledPlane;
 
     getSoundAsset(name: AssetName): Sound {
 

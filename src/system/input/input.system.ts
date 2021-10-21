@@ -1,13 +1,19 @@
-import {DeviceSourceManager, DeviceType} from "babylonjs";
+import {DeviceSourceManager, DeviceType, PerfCounter, PointerInput} from "babylonjs";
 import {SystemDescription, SystemInstance} from "../system";
 import {EngineSystem, EngineSystemImpl} from "../engine/engine.system";
 import {EventState} from "babylonjs/Misc/observable";
 import {IDeviceEvent} from "babylonjs/DeviceInput/Interfaces/inputInterfaces";
 import {InputAlias, InputAliasPipe} from "./alias";
 import {InputListener} from "./triggers";
+import {getClassName} from "../../shared/functions/get-class-name";
+import {AbstractInputEventTranslator} from "./translator/translator";
+import {MouseTranslator} from "./translator/mouse.translator";
 
 export type InputHandlerFunction = (inputState: InputState) => void;
 
+/**
+ * Object that represents current input state for some action
+ */
 export type InputState = {
 
     /**
@@ -34,8 +40,21 @@ export type InputState = {
      * Time passed since last activation
      */
     delta: number,
+
+    /**
+     * Previous time for activations faster that one frame
+     */
+    lastTimeActivated: number,
+
+    /**
+     * Previous value for activations faster that one frame
+     */
+    lastTimeActivatedValue: number,
 }
 
+/**
+ * Object that holds last input states for all once activated keys of connected devices
+ */
 export type InputStateCache = Partial<Record<DeviceType, Record<number, InputState>>>;
 
 export class InputSystemConfig {
@@ -43,22 +62,11 @@ export class InputSystemConfig {
 }
 
 /**
- * Input users should rely on aliases for buttons and not on actual inputs
- *
- * Aliases can have different possible input types (press, double, on hold (with time held), on release)
- *
- * @example
- * Rotate Camera - Hold RMB
- * Drag and Drop - Hold LMB
- * Move - Double-press LMB
- * Choose gun 1 - Press 1
- * Use shield boost - Press H
- * 
- * Keys can be combined
+ * System that allows to create input aliases and listen to them
  */
 export class InputSystemImpl extends SystemInstance<InputSystemImpl, InputSystemConfig> {
 
-    lastTickTime: number = 0;
+    inputTickCounter = new PerfCounter();
 
     inputStateCache: InputStateCache = {};
     triggerCache: Map<InputListener, any> = new Map<InputListener, any>();
@@ -69,28 +77,29 @@ export class InputSystemImpl extends SystemInstance<InputSystemImpl, InputSystem
 
     engineSystem!: EngineSystemImpl;
 
+    translators: Record<string, AbstractInputEventTranslator> = {};
+
     protected async initialize() {
-        this.engineSystem = this.provider.getInjectedSystem(EngineSystem);
+        this.engineSystem = this.provider.getSystem(EngineSystem);
+
+        this.attachEventTranslator(new MouseTranslator());
 
         this.deviceSourceManager = new DeviceSourceManager(this.engineSystem.getEngine());
 
         this.deviceSourceManager.onDeviceConnectedObservable.add(device => {
-            device.onInputChangedObservable.add(this.updateInputCache.bind(this));
-        })
+            device.onInputChangedObservable.add(event => {
+                // Pass events through translator if exists
+                const eventsToHandle = this.translators[event.deviceType]?.translate(event) ?? [ event ];
+
+                eventsToHandle.forEach(event => this.updateInputCacheWithEvent.bind(this)(event));
+            });
+        });
 
         this.engineSystem.registerBeforeRenderHook(this.tickInput.bind(this));
     }
 
-    tickInput() {
-        const startTimestamp = Date.now();
-
-        this.triggerAliases();
-        const endTimestamp = Date.now();
-        this.lastTickTime = endTimestamp - startTimestamp;
-    }
-
     getTickTime(): string {
-        return this.lastTickTime + '';
+        return this.inputTickCounter.lastSecAverage + '';
     }
 
     /**
@@ -129,15 +138,43 @@ export class InputSystemImpl extends SystemInstance<InputSystemImpl, InputSystem
         );
     }
 
-    protected updateInputCache(event: IDeviceEvent, eventState: EventState) {
+
+    /**
+     * Ticks input system
+     * @protected
+     */
+    protected tickInput() {
+        this.inputTickCounter.beginMonitoring();
+
+        this.checkAliases();
+
+        this.inputTickCounter.endMonitoring();
+    }
+
+    protected attachEventTranslator(translator: AbstractInputEventTranslator) {
+        this.translators[translator.deviceType()] = translator;
+    }
+
+    /**
+     * Updates cache using given event
+     * @param event
+     * @protected
+     */
+    protected updateInputCacheWithEvent(event: IDeviceEvent) {
         const currentInput = this.inputStateCache[event.deviceType]?.[event.inputIndex];
 
+
         if (currentInput && event.currentState === currentInput.value) {
+
+            event.inputIndex === PointerInput.LeftClick && console.log(event);
+            event.inputIndex === PointerInput.MouseWheelY && console.log(event);
+
             const timestamp = Date.now();
             currentInput.heldSinceLastActivation = timestamp - currentInput.timestamp;
             currentInput.activeTotally = currentInput.activeTotally + currentInput.heldSinceLastActivation;
         }
         else {
+
             const timestamp = Date.now();
             const newInput: InputState = {
                 value: event.currentState as number,
@@ -145,6 +182,8 @@ export class InputSystemImpl extends SystemInstance<InputSystemImpl, InputSystem
                 activeTotally: 0,
                 heldSinceLastActivation: 0,
                 delta: timestamp - (currentInput?.timestamp ?? 0),
+                lastTimeActivated: (event.currentState != 0) ? timestamp : currentInput?.lastTimeActivated ?? 0,
+                lastTimeActivatedValue: (event.currentState && event.currentState !== 0) ? event.currentState : currentInput?.lastTimeActivatedValue ?? 0
             };
 
             this.inputStateCache = {
@@ -158,23 +197,25 @@ export class InputSystemImpl extends SystemInstance<InputSystemImpl, InputSystem
     }
 
     /**
-     * Triggers should return numeric value instead of boolean
-     *
+     * Runs check for all registered aliases
      * @protected
      */
-    protected triggerAliases() {
+    protected checkAliases() {
         this.aliasHandlers.forEach((handlers, alias) => {
             const inputState = alias.bindings.reduce(
                 (acc: InputState | undefined, listener) => {
-                    return listener.getInputState(this.inputStateCache) ?? acc;
+                    return listener.getInputState(this.inputStateCache, { loggingEnabled: alias.options?.loggingEnabled }) ?? acc;
                 },
                 undefined
             );
 
             if (inputState) {
-                handlers?.forEach(handler => handler(inputState))
-            }
+                (this.provider.options.loggingEnabled || alias.options?.loggingEnabled) && console.log(`[${getClassName(this)}]: Alias [${alias.name}] triggered, calling handlers. Input state:\n`, inputState);
 
+                handlers?.forEach(handler => handler(inputState))
+            } else {
+                (this.provider.options.loggingEnabled || alias.options?.loggingEnabled) && console.log(`[${getClassName(this)}]: Alias [${alias.name}] not triggered`);
+            }
         });
     }
 }

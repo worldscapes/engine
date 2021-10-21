@@ -1,10 +1,13 @@
 {
   "name": "@worldscapes/engine",
-  "main": "./index.js",
-  "exports": "./index.js",
+  "main": "./lib/core.js",
+  "exports": "./lib/core.js",
+  "filesCommented": [
+    "lib/core.js"
+  ],
   "type": "commonjs",
   "version": "0.0.1",
-  "description": "Declarative abstraction layer over Babylon.js",
+  "description": "Custom architecture for abstraction layer over Babylon.js",
   "keywords": [
     "babylonjs",
     "worldscapes"
@@ -33,7 +36,8 @@
     "rxjs": "^7.1.0"
   },
   "peerDependencies": {
-    "babylonjs": "^5.0.0-alpha.24"
+    "babylonjs": "^5.0.0-alpha.24",
+    "bezier-js": "^4.1.1"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^4.26.1",

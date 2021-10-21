@@ -1,20 +1,23 @@
 import {AssetSystem, AssetSystemConfig} from "./system/asset/asset.system";
 import {InputSystem, InputSystemConfig} from "./system/input/input.system";
-import {PhysicsSystem, PhysicsSystemConfig} from "./system/physics/physics.system";
+import {PhysicsSystemConfig} from "./system/physics/physics.system";
 import {
     ExampleSystem,
-    ExampleSystem2,
     ExampleSystemConfig,
-    ExampleSystemConfig2
 } from "./system/example/example.system";
-import {Resolver} from "./shared/resolver";
+import {Resolver} from "./shared/classes/resolver";
 import {ErrorSystemConfig} from "./system/error/error.system";
 import {SystemDescription, SystemInstance, SystemProvider, SystemProviderOptions} from "./system/system";
 import {EngineSystem, EngineSystemConfig} from "./system/engine/engine.system";
 import {SceneSystem, SceneSystemConfig} from "./system/scene/scene.system";
-import {getClassName} from "./shared/get-class-name";
-import {SystemIsNotDeclared} from "./entity/extenders/errors/system-is-not-declared";
+import {getClassName} from "./shared/functions/get-class-name";
+import {SystemIsNotDeclared} from "./system/entity/errors/system-is-not-declared";
 import {AudioSystem, AudioSystemConfig} from "./system/audio/audio.system";
+import {EntitySystem, EntitySystemConfig} from "./system/entity/entity.system";
+import {SaveSystem, SaveSystemConfig} from "./system/save/save.system";
+import {ProfilingSystem, ProfilingSystemConfig} from "./system/profiing/profiling.system";
+import {CameraSystem, CameraSystemConfig} from "./system/camera/camera.system";
+import {CloneSystem, CloneSystemConfig} from "./core";
 
 /**
  * List of arguments that need to be provided for engine bootstrap
@@ -24,14 +27,18 @@ class GlobalBootstrapConfig {
 
 export interface EngineConfig extends GlobalBootstrapConfig,
     ExampleSystemConfig,
-    ExampleSystemConfig2,
     ErrorSystemConfig,
     EngineSystemConfig,
     SceneSystemConfig,
     AssetSystemConfig,
     InputSystemConfig,
     PhysicsSystemConfig,
-    AudioSystemConfig {}
+    AudioSystemConfig,
+    EntitySystemConfig,
+    SaveSystemConfig,
+    ProfilingSystemConfig,
+    CameraSystemConfig,
+    CloneSystemConfig {}
 
 export interface EngineBootstrapOptions {
     customSystems?: SystemDescription<any, any>[];
@@ -48,14 +55,18 @@ export class EngineBootstrap<CustomConfig extends EngineConfig = EngineConfig> {
 
     readonly inBuiltSystems: SystemDescription<any, any>[] = [
         ExampleSystem,
-        ExampleSystem2,
         // ErrorSystem,
         EngineSystem,
         SceneSystem,
         AssetSystem,
         InputSystem,
-        PhysicsSystem,
+        // PhysicsSystem,
         AudioSystem,
+        EntitySystem,
+        SaveSystem,
+        ProfilingSystem,
+        CameraSystem,
+        CloneSystem
     ];
 
     protected systemProviders!: SystemProvider<any, any>[];
@@ -95,16 +106,18 @@ export class EngineBootstrap<CustomConfig extends EngineConfig = EngineConfig> {
             console.info(`[${getClassName(this)}]: ` + this.buildNeededFieldsMessage(this.providedConfig));
         }
 
-        this.systemProviders.forEach(systemProvider => systemProvider.getSystem().then(system => {
+        this.systemProviders.forEach(systemProvider => systemProvider.getContainedSystem().then(system => {
 
-            this.systemProviders.filter(provider => !provider.isReady()).forEach(provider => provider.injectSystem(system));
+            this.systemProviders
+                .filter(provider => !provider.isReady())
+                .forEach(provider => provider.injectSystem(system));
 
             if (this.isAllProvidersComplete(this.systemProviders)) {
                 this.completionResolver.resolve();
             }
         }));
 
-        this.provideConfigToProviders(this.providedConfig);
+        setTimeout(() => this.provideConfigToProviders(this.providedConfig), 0);
     }
 
     static initEngine<CustomConfig extends EngineConfig = EngineConfig>(
@@ -162,7 +175,7 @@ export class EngineBootstrap<CustomConfig extends EngineConfig = EngineConfig> {
             throw new SystemIsNotDeclared(getClassName(this), description);
         }
 
-        return provider?.getSystem();
+        return provider?.getContainedSystem();
     }
 
     protected provideConfigToProviders(configUpdate: Partial<EngineConfig>) {

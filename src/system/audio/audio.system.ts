@@ -2,7 +2,7 @@ import {SystemDescription, SystemInstance} from "../system";
 import {AssetSystem, AssetSystemImpl} from "../asset/asset.system";
 import {EngineSystem, EngineSystemImpl} from "../engine/engine.system";
 import {Engine, Sound} from "babylonjs";
-import {Resolver} from "../../shared/resolver";
+import {Resolver} from "../../shared/classes/resolver";
 
 export class AudioSystemConfig {
     globalVolume: number = 1;
@@ -26,8 +26,8 @@ export class AudioSystemImpl extends SystemInstance<AudioSystemImpl, AudioSystem
         if (Engine.audioEngine) {
             Engine.audioEngine.useCustomUnlockedButton = true;
         }
-        this.assetSystem = this.provider.getInjectedSystem(AssetSystem);
-        this.engineSystem = this.provider.getInjectedSystem(EngineSystem);
+        this.assetSystem = this.provider.getSystem(AssetSystem);
+        this.engineSystem = this.provider.getSystem(EngineSystem);
         this.start();
     }
 
@@ -41,7 +41,7 @@ export class AudioSystemImpl extends SystemInstance<AudioSystemImpl, AudioSystem
     setAmbientTracks(trackNames: string[])  {
         this.ambientTracks = trackNames.map(name => {
             const soundAsset = this.assetSystem.getSoundAsset(name);
-            soundAsset.setVolume(this.provider.getInjectConfig().globalVolume);
+            soundAsset.setVolume(this.provider.getConfig().globalVolume);
             return {
                 playedThisRow: false,
                 sound: soundAsset,
@@ -52,7 +52,7 @@ export class AudioSystemImpl extends SystemInstance<AudioSystemImpl, AudioSystem
 
     playSound(name: string) {
         const soundAsset = this.assetSystem.getSoundAsset(name);
-        soundAsset.setVolume(this.provider.getInjectConfig().globalVolume);
+        soundAsset.setVolume(this.provider.getConfig().globalVolume);
         soundAsset.play();
     }
 
@@ -77,7 +77,7 @@ export class AudioSystemImpl extends SystemInstance<AudioSystemImpl, AudioSystem
                             console.log("One track finished")
                         }
                     }
-                    await this.createPause(this.provider.getInjectConfig().ambientSilenceTime);
+                    await this.createPause(this.provider.getConfig().ambientSilenceTime);
                     waitingBeforeNextTrack = false;
                 }
                 console.log('All tracks finished');

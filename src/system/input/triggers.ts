@@ -1,18 +1,20 @@
 import {DeviceType} from "babylonjs";
 import {InputState, InputStateCache} from "./input.system";
-import {PressFilter} from "./deciders/press.filter";
-import {DoubleFilter} from "./deciders/double.filter";
-// import {PressNotDoubleDecider} from "./deciders/press-not-double.decider";
-// import {PressFirstOfDoubleDecider} from "./deciders/press-first-of-double.decider";
-import {HoldFilter} from "./deciders/hold.filter";
-// import {ReleaseDecider} from "./deciders/realease.decider";
-// import {PressSequenceStop} from "./deciders/press-sequence-stop.decider";
-// import {HoldOnceDecider} from "./deciders/hold-once.decider";
+import {PressFilter} from "./filters/press.filter";
+import {DoubleFilter} from "./filters/double.filter";
+import {HoldFilter} from "./filters/hold.filter";
 
+/**
+ * Interface for all entities that can listen to input
+ * It can be InputTrigger or some custom listener type that combines several InputTriggers
+ */
 export interface InputListener {
-    getInputState(inputStateCache: InputStateCache): InputState | undefined;
+    getInputState(inputStateCache: InputStateCache, options?: { loggingEnabled?: boolean }): InputState | undefined;
 }
 
+/**
+ * Object that contains configuration for input
+ */
 export class InputTrigger<T extends InputTriggerTypes> implements InputListener {
 
     constructor(
@@ -21,20 +23,36 @@ export class InputTrigger<T extends InputTriggerTypes> implements InputListener 
         readonly triggerType: T,
     ) {}
 
-    getInputState(inputStateCache: InputStateCache): InputState | undefined {
-        return InputTriggers[this.triggerType]?.(this, inputStateCache);
+    /**
+     * Checks if trigger is active on given input state
+     * @param inputStateCache InputStateCache to check
+     * @param options Additional options
+     * @returns InputState if triggered, otherwise undefined
+     */
+    getInputState(inputStateCache: InputStateCache, options?: { loggingEnabled?: false }): InputState | undefined {
+        return InputTriggerFilters[this.triggerType]?.(this, inputStateCache, { loggingEnabled: options?.loggingEnabled });
     }
 }
 
-export type InputTriggerFilter = (trigger: InputTrigger<any>, globalInputsState: InputStateCache) => InputState | undefined;
+/**
+ * Function that analyses input to decide if trigger was activated
+ */
+export type InputTriggerFilter = (trigger: InputTrigger<any>, globalInputsState: InputStateCache, options?: { loggingEnabled?: boolean }) => InputState | undefined;
 
+
+/**
+ * List of all implemented input types
+ */
 export enum InputTriggerTypes {
     Press,
     Double,
     Hold,
 }
 
-export const InputTriggers = {
+/**
+ * List of trigger type implementations
+ */
+export const InputTriggerFilters = {
 
     /**
      * Called when input pressed
@@ -89,5 +107,3 @@ export const InputTriggers = {
     // PressSequenceStop: PressSequenceStop,
 
 } as const;
-
-export type InputTriggerType = keyof typeof InputTriggerTypes;

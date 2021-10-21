@@ -1,7 +1,20 @@
 import {InputListener, InputTriggerTypes} from "./triggers";
 import {InputState, InputSystemImpl} from "./input.system";
+import {DeepImmutable} from "babylonjs/types";
 
 /**
+ * Object that configures some input action
+ *
+ * Idea is that input users should rely on aliases for buttons and not on actual inputs
+ * Aliases can have different possible input types (press, double, on hold (with time held), on release)
+ *
+ * @example
+ * Rotate Camera - Hold RMB
+ * Drag and Drop - Hold LMB
+ * Move - Double-press LMB
+ * Choose gun 1 - Press 1
+ * Use shield boost - Press H
+ *
  * @internal Should stay serializable
  */
 export class InputAlias {
@@ -12,14 +25,17 @@ export class InputAlias {
      * If custom bindings are set, they override default ones
      */
     get bindings() {
-        return this.customBindings ?? this.defaultBindings;
+        return this.options?.customBindings ?? this.defaultBindings;
     }
 
     constructor(
         readonly name: string,
         readonly allowedTriggerTypes: InputTriggerTypes[],
         readonly defaultBindings: InputListener[],
-        protected customBindings?: InputListener[],
+        readonly options?: DeepImmutable<{
+            loggingEnabled?: boolean,
+            customBindings?: InputListener[]
+        }>
     ) {}
 }
 

@@ -8,10 +8,12 @@ import {
     Camera,
     EffectLayer,
     Geometry,
+    InstancedMesh,
     Layer,
     LensFlareSystem,
     Light,
     Material,
+    Mesh,
     MorphTargetManager,
     MultiMaterial,
     Node,
@@ -31,6 +33,7 @@ import {AbstractScene} from "babylonjs/abstractScene";
 import {MeshStrategy} from "./mesh.strategy";
 import {InstancedMeshStrategy} from "./instanced-mesh.strategy";
 import SubSurfaceConfiguration = BABYLON.SubSurfaceConfiguration;
+import {objectIsOfBabylonClass} from "../../../shared/functions/object-is-of-babylon-class";
 
 export type SceneContainedData =
     AbstractActionManager |
@@ -61,21 +64,36 @@ export type SceneContainedData =
 
 export type DetailedSceneContainedData = SceneContainedData;
 
+type StrategiesRegistry<T extends DetailedSceneContainedData> = { type: new (...args) => DetailedSceneContainedData, strategy: (container: AbstractScene, object: T) => void }[];
+
 /**
- * More general strategies must be lower to not override more specialized ones
+ * More general strategies must be lower to not execute before inherited ones
  */
-export const deepCopyStrategies: (typeof deepPutIntoContainer)[] = [
-    InstancedMeshStrategy,
-    MeshStrategy,
-    CameraStrategy,
-    TransformNodeStrategy,
+export const deepCopyStrategies: StrategiesRegistry<any> = [
+    {
+        type: InstancedMesh,
+        strategy: InstancedMeshStrategy,
+    },
+    {
+        type: Mesh,
+        strategy: MeshStrategy,
+    },
+    {
+        type: Camera,
+        strategy: CameraStrategy,
+    },
+    {
+        type: TransformNode,
+        strategy: TransformNodeStrategy,
+    },
 ];
 
-export function deepPutIntoContainer(container: AbstractScene, object: DetailedSceneContainedData): boolean {
+export function deepPutIntoContainer(container: AbstractScene, object: DetailedSceneContainedData) {
     return deepCopyStrategies.reduce(
-        (acc: boolean, strategy: typeof deepPutIntoContainer) => {
-            if (!acc) {
-                return strategy(container, object)
+        (acc: boolean, {type, strategy }) => {
+            if (!acc && objectIsOfBabylonClass(type, object)) {
+                strategy(container, object);
+                return true;
             } else {
                 return acc;
             }

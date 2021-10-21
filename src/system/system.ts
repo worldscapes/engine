@@ -1,23 +1,29 @@
-import {Resolver} from "../shared/resolver";
-import {getClassName} from "../shared/get-class-name";
+import {Resolver} from "../shared/classes/resolver";
+import {getClassName} from "../shared/functions/get-class-name";
 
 /**
  * Base class for system implementation.
  *
+ * System is a class that groups functionality related to some feature in an application.
+ * Examples: Input system, Sound system, Network system, Notifications system, Chat system
+ * Basically, systems hold functionality and data that is needed for it to work. Usually it's just temporary objects
+ * that can be easily created on application start (link to canvas, options that where used to create system,
+ * )
+ *
  * Steps to add new system:
  *  - Create system folder and file
- *  - Create system config
- *  - Create system description
+ *  - Create system config class
  *  - Create system implementation class
- *  - Create system provider using description and implementation
- *  - Register system providers in bootstrap
+ *  - Create system description
+ *  - Register system description in bootstrap
  *  - Merge system config interface to global config type
  *
- * Implements SystemDescription interface so it can be used as description
+ * Implements {@link SystemDescription} interface so it can be used as description. Sometimes it can be more convenient.
  *
  * Systems should not be used to store game state as they are not serialized
+ * If you need to store system state, consider creating special entity
  *
- * Consider storing state in special entity
+ * @example <br/> {@link ExampleSystem}
  */
 export abstract class SystemInstance<SystemType extends SystemInstance<SystemType, SystemConfigType>,
     SystemConfigType extends {}> implements SystemDescription<SystemType, SystemConfigType> {
@@ -55,25 +61,34 @@ export abstract class SystemInstance<SystemType extends SystemInstance<SystemTyp
         protected provider: SystemProvider<SystemType, SystemConfigType>,
     ) {
         console.log(`[${getClassName(this)}]: System created, starting initialization`)
-        this.initialize().then(() => {
-            this.initializeResolver.resolve();
-            console.log(`[${getClassName(this)}]: Initialized system`)
-        });
+
+        // Setting timeout so object fields set up before calling initialize() method
+        setTimeout(
+            () => this.initialize().then(
+                () => {
+                    this.initializeResolver.resolve();
+                    console.log(`[${getClassName(this)}]: Initialized system`)
+                }
+            ),
+            0
+        );
     }
 
     /**
-     * Asynchronous method for system initialization.
+     * @description
+     * Method that is called right after system creation. Serves as constructor, but can do async operations. <br>
+     * System will not be provided to users while initialize is returned promise not resolved
      *
-     * Should return promise that is resolved when system is ready to use.
+     * @protected
      */
     protected abstract initialize(): Promise<void>;
 }
 
 
 /**
- * Object that describes system configuration.
+ * Object that describes system dependencies and used by wEngine to create and initialize system.
  *
- * It contains system constructor, config template constructor, systems required for current system.
+ * It contains system constructor, config template constructor, descriptions for systems required by current system.
  */
 export class SystemDescription<
     SystemType extends SystemInstance<SystemType, SystemConfigType>,
@@ -88,6 +103,12 @@ export class SystemDescription<
         return this.systemConstructor.name;
     };
 
+    /**
+     *
+     * @param configConstructor System config constructor
+     * @param systemConstructor System instance constructor
+     * @param required Required systems descriptions. System will not be created until those are all initialized
+     */
     constructor(
         readonly configConstructor: new (...args) => SystemConfigType,
         readonly systemConstructor: new (description: SystemDescription<SystemType, SystemConfigType>, provider: SystemProvider<SystemType, SystemConfigType>) => SystemType,
@@ -139,27 +160,29 @@ export class SystemProvider<
 
     //endregion
 
+    get options(): Readonly<SystemProviderOptions> {
+        return this._options;
+    }
+
     constructor(
         protected description: SystemDescription<SystemType, SystemConfigType>,
-        protected options: SystemProviderOptions = {},
+        protected _options: SystemProviderOptions = {},
     ) {
-        if (this.options.loggingEnabled) {
+        if (this._options.loggingEnabled) {
             console.info(`[${getClassName(this)}: ${this.description.type}]: Created\nExpected config fields: [${
                 this.getExpectedConfigKeys().join(', ')
             }]\nExpected systems: [${
                 this.getRequiredSystemTypes().join(', ')  
             }]`);
         }
-
-        this.createIfReady();
     }
 
     /**
      * Toggles logging on provider
      */
-    toggleLogging(state: boolean = !this.options?.loggingEnabled) {
-        this.options = {
-            ...(this.options ?? {}),
+    toggleLogging(state: boolean = !this._options?.loggingEnabled) {
+        this._options = {
+            ...(this._options ?? {}),
             loggingEnabled: state
         };
     }
@@ -167,7 +190,7 @@ export class SystemProvider<
     /**
      * System will be provided as soon as entire config was provided and all needed systems were provided
      */
-    async getSystem(): Promise<SystemType> {
+    async getContainedSystem(): Promise<SystemType> {
         return this.systemResolver.promise;
     }
 
@@ -176,7 +199,7 @@ export class SystemProvider<
      * Returns instance of injected system
      * @param description
      */
-    getInjectedSystem<InjectedSystemType extends SystemInstance<InjectedSystemType, SystemConfigType>,
+    getSystem<InjectedSystemType extends SystemInstance<InjectedSystemType, SystemConfigType>,
         SystemConfigType extends {}>(description: SystemDescription<InjectedSystemType, SystemConfigType>): InjectedSystemType {
         const system = this.injectedSystems[description.type];
         if (!system) {
@@ -189,7 +212,7 @@ export class SystemProvider<
     /**
      * Returns config injected into provider
      */
-    getInjectConfig(): Required<SystemConfigType> {
+    getConfig(): Required<SystemConfigType> {
         return this.injectedConfig as Required<SystemConfigType>;
     }
 
@@ -205,7 +228,7 @@ export class SystemProvider<
         const usedConfigKeys = this.getExpectedConfigKeys().filter(key => newConfigKeys.includes(key) && newConfig[key] != null);
         usedConfigKeys.forEach(key => this.injectedConfig[key] = newConfig[key])
 
-        if (this.options?.loggingEnabled && usedConfigKeys.length > 0) {
+        if (this._options?.loggingEnabled && usedConfigKeys.length > 0) {
 
             console.log(`[${getClassName(this)}: ${this.description.type}]: Received config fields [${
                 usedConfigKeys.join(', ')
@@ -214,7 +237,7 @@ export class SystemProvider<
 
         if (this.allConfigFieldsInjected()) {
 
-            if (this.options?.loggingEnabled && !this.allConfigFieldsInjectedReported) {
+            if (this._options?.loggingEnabled && !this.allConfigFieldsInjectedReported) {
                 console.log(`[${getClassName(this)}: ${this.description.type}]: All required config fields provided`);
             }
             this.allConfigFieldsInjectedReported = true;
@@ -235,13 +258,13 @@ export class SystemProvider<
             this.injectedSystems[system.type] = system;
         }
 
-        if (this.options?.loggingEnabled && providedSystemUsed) {
+        if (this._options?.loggingEnabled && providedSystemUsed) {
             console.log(`[${getClassName(this)}: ${this.description.type}]: Received system [${system.type}]`);
         }
 
         if (this.allSystemsInjected()) {
 
-            if (this.options?.loggingEnabled && !this.allSystemsInjectedReported) {
+            if (this._options?.loggingEnabled && !this.allSystemsInjectedReported) {
                 console.log(`[${getClassName(this)}: ${this.description.type}]: All required systems provided`);
             }
             this.allSystemsInjectedReported = true;
@@ -313,14 +336,14 @@ export class SystemProvider<
 
         if (isReady && !isCreated) {
 
-            if (this.options?.loggingEnabled) {
+            if (this._options?.loggingEnabled) {
                 console.log(`[${getClassName(this)}: ${this.description.type}]: Creating system`);
             }
 
             this.systemInstance = new this.systemConstructor(this.description, this);
             this.systemInstance.onInit.then(() => {
 
-                if (this.options?.loggingEnabled) {
+                if (this._options?.loggingEnabled) {
                     console.log(`[${getClassName(this)}: ${this.description.type}]: System started`);
                 }
 
