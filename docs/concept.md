@@ -8,7 +8,7 @@ layer.
 >        <li> What does it use to achieve it's goal?
 >    </ol>
 
----
+
 
 ## Engine Goals
 
@@ -19,7 +19,7 @@ layer.
 - Extend Babylon.JS with features that are missing and provide 
   more organized and usable solutions in different domains
   
----
+
 
 ## Expected Features
 
@@ -45,7 +45,7 @@ layer.
 - Game entities can be tested independently
 - Lazy loading game resources and entity implementations
 
----
+
 
 ## Concept
 
@@ -60,7 +60,7 @@ Engine provides access to Babylon.js features using Systems. Systems are namespa
 related to different aspects of game and abstract Babylon.js API in their own methods.
 User can implement their own systems depending on project needs. 
 
----
+
 
 ## Layers
 
@@ -100,7 +100,7 @@ Engine regulates data flow, so it flows in one direction:
 - Engine processes input and events, changing state of game entities
 - Engine uses entity state to update presentational layer
 
----
+
 
 ## Event layer
 
@@ -120,7 +120,7 @@ dispatch data that is transformed into events as well.
 Some events can impact Presentational layer itself (e.g., camera movement), and they can be not needed on server.
 Because of that, Event layer might need to work with Presentational layer and World layer separately.
 
----
+
 
 ## World layer
 
@@ -227,7 +227,7 @@ function damageSystemImpl(
 }
 ```
 
----
+
 
 ## Networking layer
 
@@ -241,7 +241,7 @@ locally in single-player games.
 
 - Providing customizable layer to transfer data between server-side and client-side
 
----
+
 
 ## Presentation layer
 
@@ -297,7 +297,7 @@ layer.
 
 Display logic is client-side logic that take resulting world state from preprocessing layer and presents it to user.
 
----
+
 
 ## Aspects shared between layers
 
@@ -306,7 +306,7 @@ Some aspects go throughout the application, so they are implemented in between o
 - Networking
 - Error handling
 
----
+
 
 ## Example Game Entities
 
