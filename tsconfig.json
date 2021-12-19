@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "baseUrl": ".",
-    "outDir": "./lib",
+    "outDir": "./dist",
     "target": "ES6",
     "module": "CommonJS",
     "declaration": true,
@@ -21,9 +21,4 @@
   "types": [
     "babylonjs"
   ],
-  "typedocOptions": {
-    "entryPoints": ["src/core.ts"],
-    "out": "docs/typedoc",
-    "theme": "minimal"
-  }
 }
