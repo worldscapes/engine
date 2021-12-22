@@ -1,12 +1,10 @@
 {
   "name": "@worldscapes/engine",
-  "main": "lib/index.js",
-  "filesCommented": [
-    "lib/core.js"
-  ],
-  "type": "commonjs",
-  "version": "0.0.1",
-  "description": "Custom architecture for abstraction layer over Babylon.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": ["/dist"],
+  "version": "0.0.2",
+  "description": "Data-driven framework for game development",
   "keywords": [
     "babylonjs",
     "worldscapes"
