@@ -1,5 +1,5 @@
 {
-  "ignore": ["**/*.test.ts", "**/*.spec.ts", "node_modules", "lib"],
+  "ignore": ["**/*.test.ts", "**/*.spec.ts", "node_modules", "dist"],
   "watch": ["src"],
   "exec": "npm run build",
   "ext": "ts"

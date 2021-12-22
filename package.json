@@ -12,7 +12,7 @@
   "author": "Siarhei Filinski (sfilisnky@gmail.com)",
   "license": "ISC",
   "scripts": {
-    "clear": "del-cli --force ./lib",
+    "clear": "del-cli --force ./dist",
     "build:docs": "typedoc",
     "start": "nodemon",
     "start:clean": "npm run clear && npm run start",
