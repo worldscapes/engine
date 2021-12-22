@@ -1,3 +1,3 @@
-import {ECRStructure} from "../structure";
+import {Structure} from "../../../structure/structure";
 
-export class ECRComponent extends ECRStructure {}
+export abstract class ECRComponent extends Structure {}
