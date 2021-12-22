@@ -1,6 +1,10 @@
+import {ECR} from "../simulation/ecr.api";
+
 export class WorldscapesServer {
 
-    constructor() {}
+    constructor(
+        readonly ecr: ECR = new ECR()
+    ) {}
 
     public run() {
         setTimeout(

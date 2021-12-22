@@ -2,14 +2,12 @@ import {ECRRule} from "./rule/rule";
 
 export class ECR {
 
-    constructor(
+    protected rules: ECRRule[] = [];
 
-    ) {
-
-    }
+    constructor() {}
 
     public addRule(rule: ECRRule) {
-
+        this.rules.push(rule);
     }
 
 }

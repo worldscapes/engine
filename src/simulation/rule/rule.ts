@@ -1,12 +1,12 @@
-export interface RuleQuery {}
+export interface ECRRuleQuery {}
 
-export type RuleCondition = () => {};
-export type RuleBody = () => {};
+export type ECRRuleCondition = () => boolean;
+export type ECRRuleBody = () => void;
 
-export interface Rule {
+export interface ECRRule {
 
-    query: RuleQuery,
-    condition: RuleCondition,
-    body: RuleBody
+    query: ECRRuleQuery,
+    condition: ECRRuleCondition,
+    body: ECRRuleBody
 
 }
