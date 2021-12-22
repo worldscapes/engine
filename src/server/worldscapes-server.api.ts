@@ -3,16 +3,27 @@ import {ECR} from "../simulation/ecr.api";
 export class WorldscapesServer {
 
     constructor(
-        readonly ecr: ECR = new ECR()
+        private ecr: ECR = new ECR()
     ) {}
 
     public run() {
-        setTimeout(
+        setInterval(
             () => {
-
+                this.ecr.runSimulation();
             },
-            32,
+            1000,
         );
     }
+
+    readonly addRule: (...args: Parameters<ECR["addRule"]>) => this = (args) => {
+        this.ecr.addRule(args);
+        return this;
+    }
+
+    readonly addCustomCommandHandler: (...args: Parameters<ECR["addCustomCommandHandler"]>) => this = (args) => {
+        this.ecr.addCustomCommandHandler(args);
+        return this;
+    }
+
 
 }
