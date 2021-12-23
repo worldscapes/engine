@@ -2,13 +2,17 @@ import {ECRRule} from "./rule/rule";
 import {ECRCommandHandler} from "./command/command-hander";
 import {ECRCommand} from "./command/command";
 import {getClassName} from "../utility/functions/get-class-name";
+import {ECRStore} from "./store/store.api";
+import {SimpleStore} from "./store/implementations/simple.store";
 
 export class ECR {
 
     protected rules: ECRRule[] = [];
     protected commandHandlers: ECRCommandHandler<any>[] = [];
 
-    constructor() {}
+    constructor(
+        protected store: ECRStore = new SimpleStore()
+    ) {}
 
     public runSimulation() {
         console.log("------------------");
@@ -23,7 +27,7 @@ export class ECR {
                 const commandName = getClassName(command);
                 const commandHandlerId = handlerTypes.indexOf(commandName);
                 if (commandHandlerId != -1) {
-                    this.commandHandlers[commandHandlerId].effect(command);
+                    this.commandHandlers[commandHandlerId].effect(command, this.store);
                 }
             });
         });
