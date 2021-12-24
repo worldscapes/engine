@@ -12,7 +12,6 @@ export class AddResourceCommand<T extends ECRResource> {
 export const addResourceHandler = createCommandHandler(
     AddResourceCommand,
     (command, store) => {
-        console.log(1);
         store.addResource(command.resourceName, command.resource);
     }
 );
