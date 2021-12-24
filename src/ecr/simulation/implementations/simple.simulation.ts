@@ -39,19 +39,30 @@ export class SimpleSimulation extends ECRSimulation {
         const handlerTypes = this.commandHandlers.map(handler => handler.commandType);
 
         this.rules.forEach(rule => {
+
+            // Leave if condition is not fulfilled
+            const conditionResult = rule.condition();
+            if (!conditionResult) return;
+
+            // Execute rule
             let commands = [...rule.body()];
+
+            // Handle commands
             let i = 0;
             while (i < commands.length) {
+
                 const command = commands[i];
-                const commandName = getClassName(command);
-                const commandHandlerId = handlerTypes.indexOf(commandName);
-                if (commandHandlerId != -1) {
+
+
+                const commandHandlerId = handlerTypes.indexOf(getClassName(command));
+                if (commandHandlerId !== -1) {
                     const returnedCommands = this.commandHandlers[commandHandlerId].effect(command, store);
                     if (returnedCommands && returnedCommands.length > 0) {
-                        // Insert after current command
+                        // Insert returned commands after current
                         commands = [ ...commands.slice(0, i + 1), ...returnedCommands, ...commands.slice(i + 1, commands.length) ];
                     }
                 }
+
                 i++;
             }
         });
