@@ -1,10 +1,8 @@
 import {ECRStore} from "../store.api";
 import {ECRComponent} from "../../state/component/component";
 import {ECRResource} from "../../state/resource/resource";
-import {Constructor} from "../../../utility/types/constructor";
-import {getClassName} from "../../../utility/functions/get-class-name";
 
-class Entity {
+export class ECREntity {
     constructor(
         readonly id: number
     ) {}
@@ -12,14 +10,14 @@ class Entity {
 
 export class SimpleStore extends ECRStore {
 
-    protected entities: Entity[] = [];
+    protected entities: ECREntity[] = [];
     protected components: Record<number, ECRComponent[]> = {};
     protected resources: Record<string, ECRResource> = {};
 
-    addEntity(): number {
-        const lastId = this.entities.length !== 0 ? this.entities[this.entities.length - 1].id : 1;
+    createEntity(): number {
+        const lastId = this.entities.length !== 0 ? this.entities[this.entities.length - 1].id : 0;
 
-        const entity = new Entity(lastId + 1);
+        const entity = new ECREntity(lastId + 1);
         this.entities.push(entity);
         this.components[entity.id] = [];
 
@@ -27,7 +25,7 @@ export class SimpleStore extends ECRStore {
     }
 
     deleteEntity(entityId: number): void {
-        this.entities.filter(entity => entity.id !== entityId);
+        this.entities = this.entities.filter(entity => entity.id !== entityId);
         delete this.components[entityId];
     }
 
@@ -35,18 +33,17 @@ export class SimpleStore extends ECRStore {
         this.components[entityId].push(component);
     }
 
-    updateComponent<T extends ECRComponent>(entityId: number, component: T): void {
-        this.components[entityId].map(el => {
-            if (getClassName(el) === getClassName(component)) {
-                return component;
+    updateComponent<T extends ECRComponent>(entityId: number, oldComponent: T, newComponent: T): void {
+        this.components[entityId].forEach((el, index) => {
+            if (el === oldComponent) {
+                this.components[entityId][index] = newComponent;
             }
-            return el;
         });
     }
 
-    deleteComponent<T extends ECRComponent>(entityId: number, component: Constructor<T>): void {
-        this.components[entityId].filter(el => {
-            if (getClassName(el) !== getClassName(component)) {
+    deleteComponent<T extends ECRComponent>(entityId: number, component: T): void {
+        this.components[entityId] = this.components[entityId].filter(el => {
+            if (el !== component) {
                 return el;
             }
         });
@@ -65,13 +62,13 @@ export class SimpleStore extends ECRStore {
         }
     }
 
-    removeResource<T extends ECRResource>(resourceName: string): void {
+    deleteResource<T extends ECRResource>(resourceName: string): void {
         if (this.resources[resourceName]) {
             delete this.resources[resourceName];
         }
     }
 
-    getSnapshot() {
+    getSnapshot(): { entities: ECREntity[], components: Record<number, ECRComponent[]>, resources: Record<string, ECRResource> } {
         return {
             entities: this.entities,
             components: this.components,

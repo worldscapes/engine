@@ -1,4 +1,4 @@
-import {ECR} from "../simulation/ecr.api";
+import {ECR} from "../ecr/ecr.api";
 
 export class WorldscapesServer {
 

@@ -2,7 +2,7 @@ import {ECRCommand} from "./command";
 import {Constructor} from "../../utility/types/constructor";
 import {ECRStore} from "../store/store.api";
 
-export type ECRCommandEffect<T extends ECRCommand> = (command: T, store: ECRStore) => void;
+export type ECRCommandEffect<T extends ECRCommand> = (command: T, store: ECRStore) => ECRCommand[] | void;
 
 export interface ECRCommandHandler<T extends ECRCommand> {
     commandType: string,
