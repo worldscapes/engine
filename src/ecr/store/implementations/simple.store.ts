@@ -1,6 +1,13 @@
 import {ECRStore} from "../store.api";
 import {ECRComponent} from "../../state/component/component";
 import {ECRResource} from "../../state/resource/resource";
+import {ECRQuery} from "../../query/query";
+import {
+    ECRComponentStoreQueryType,
+    ECREntityStoreRequest,
+    ECRResourceStoreRequest,
+    ECRStoreQuerySubscription
+} from "../request/request";
 
 export class ECREntity {
     constructor(
@@ -13,6 +20,82 @@ export class SimpleStore extends ECRStore {
     protected entities: ECREntity[] = [];
     protected components: Record<number, ECRComponent[]> = {};
     protected resources: Record<string, ECRResource> = {};
+
+    subscribeQuery(query: ECRQuery<ECREntityStoreRequest | ECRResourceStoreRequest>): ECRStoreQuerySubscription {
+        return {
+            getCurrentData: () => {
+
+                const result = {};
+
+                // Handle each query request
+                Object.keys(query).forEach(
+                    (requestKey) => {
+                        const request = query[requestKey];
+
+                        // For Component requests
+                        if (request instanceof ECREntityStoreRequest) {
+
+                            const foundEntityComponents: ECRComponent[][] = [];
+
+                            // Check all entities store has
+                            this.entities.forEach(entity => {
+                                const components = this.components[entity.id];
+
+                                // Looks for requested components in given entity
+                                const foundComponents: ECRComponent[] = [];
+                                let allFound = false;
+                                let i = 0;
+                                while (i < request.selectors.length) {
+                                    const selector = request.selectors[i];
+
+                                    const foundComponent = components.find(component => component instanceof selector.componentType);
+
+                                    if (selector.queryType === ECRComponentStoreQueryType.HAS) {
+                                        if (!foundComponent) {
+                                            break;
+                                        }
+                                    }
+
+                                    if (selector.queryType === ECRComponentStoreQueryType.HAS_NOT) {
+                                        if (foundComponent) {
+                                            break;
+                                        }
+                                    }
+
+                                    if (selector.queryType === ECRComponentStoreQueryType.NEEDED) {
+                                        if (!foundComponent) {
+                                            break;
+                                        }
+
+                                        foundComponents.push(foundComponent);
+                                    }
+
+
+                                    i++;
+                                    if (i === request.selectors.length) {
+                                        allFound = true;
+                                    }
+                                }
+
+                                if (allFound) {
+                                    foundEntityComponents.push(foundComponents);
+                                }
+                            })
+
+                            result[requestKey] = foundEntityComponents;
+                        }
+
+                        // For Resource requests
+                        if (request instanceof ECRResourceStoreRequest) {
+                            result[requestKey] = this.resources[request.resourceName];
+                        }
+                    }
+                );
+
+                return result;
+            },
+        }
+    }
 
     createEntity(): number {
         const lastId = this.entities.length !== 0 ? this.entities[this.entities.length - 1].id : 0;

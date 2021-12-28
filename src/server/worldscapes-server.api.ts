@@ -9,7 +9,7 @@ export class WorldscapesServer {
     public run() {
         setInterval(
             () => {
-                this.ecr.startSimulation();
+                this.ecr.runSimulationTick();
             },
             1000,
         );
