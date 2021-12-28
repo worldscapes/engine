@@ -1,13 +1,13 @@
 import {ECRCommand} from "../command/command";
-
-export interface ECRRuleQuery {}
+import {ECRQuery} from "../query/query";
+import {ECREntitySimulationRequest, ECRResourceSimulationRequest} from "../simulation/request/request";
 
 export type ECRRuleCondition = () => boolean;
-export type ECRRuleBody = () => ECRCommand[];
+export type ECRRuleBody = (data: any) => ECRCommand[] | void;
 
 export interface ECRRule {
 
-    query: ECRRuleQuery,
+    query: ECRQuery<ECREntitySimulationRequest | ECRResourceSimulationRequest>,
     condition: ECRRuleCondition,
     body: ECRRuleBody
 
