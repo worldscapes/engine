@@ -11,7 +11,7 @@ import {deleteComponentHandler} from "../../command/built-in/delete-component.co
 import {addResourceHandler} from "../../command/built-in/add-resource.command";
 import {updateResourceHandler} from "../../command/built-in/update-resource.command";
 import {deleteResourceHandler} from "../../command/built-in/delete-resource.command";
-import {SimpleStore} from "../../store/implementations/simple.store";
+import {ECREntity, SimpleStore} from "../../store/implementations/simple.store";
 import {ECRStore} from "../../store/store.api";
 import {
     ECRComponentSimulationQueryType,
@@ -27,6 +27,14 @@ import {
 } from "../../store/request/request";
 import {ECRComponent} from "../../state/component/component";
 import {ECRQuery} from "../../query/query";
+import {ECRResource} from "../../state/resource/resource";
+
+export interface WorldStateSnapshot {
+    entities: ECREntity[],
+    components: Record<number, ECRComponent[]>,
+    resources: Record<string, ECRResource>
+}
+
 
 export class SimpleSimulation extends ECRSimulation {
 
@@ -57,10 +65,11 @@ export class SimpleSimulation extends ECRSimulation {
     }
 
 
-    public runSimulationTick() {
+    public runSimulationTick()  {
         console.log("------------------");
 
         const handlerTypes = this.commandHandlers.map(handler => handler.commandType);
+        const allCommands: ECRCommand[] = [];
 
         this.rules.forEach(rule => {
 
@@ -96,11 +105,11 @@ export class SimpleSimulation extends ECRSimulation {
 
 
             // Leave if condition is not fulfilled
-            const conditionResult = rule.condition();
+            const conditionResult = rule.condition(dataForCondition);
             if (!conditionResult) return;
 
             // Execute rule
-            let commands = rule.body(dataForBody) ?? [];
+            let commands: ECRCommand[] = rule.body(dataForBody) ?? [];
 
             // Handle commands
             let i = 0;
@@ -121,7 +130,15 @@ export class SimpleSimulation extends ECRSimulation {
 
                 i++;
             }
+
+            allCommands.push(commands);
+
         });
+
+        return {
+            snapshot: this.store.getSnapshot(),
+            commands: allCommands,
+        }
     }
 
     public addRule(rule: ECRRule) {
@@ -130,10 +147,13 @@ export class SimpleSimulation extends ECRSimulation {
         const storeQuery = this.convertSimulationQueryToStoreQuery(rule.query);
 
         this.querySubMap.set(rule, this.store.subscribeQuery(storeQuery));
+
+        return this;
     }
 
     public addCustomCommandHandler<T extends ECRCommand>(handler: ECRCommandHandler<T>) {
         this.commandHandlers.push(handler);
+        return this;
     }
 
     protected convertSimulationQueryToStoreQuery(
