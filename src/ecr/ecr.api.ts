@@ -1,13 +1,12 @@
 import {ECRSimulation} from "./simulation/simulation.api";
-import {SimpleSimulation} from "./simulation/implementations/simple.simulation";
 
-export class ECR {
+export class ECRApi {
 
     constructor(
-        protected simulation: ECRSimulation = new SimpleSimulation(),
+        protected simulation: ECRSimulation
     ) {}
 
-    readonly runSimulationTick: () => void = () => { this.simulation.runSimulationTick() };
+    readonly runSimulationTick: ECRSimulation['runSimulationTick'] = this.simulation.runSimulationTick.bind(this.simulation);
     readonly addRule: ECRSimulation['addRule'] = this.simulation.addRule.bind(this.simulation);
     readonly addCustomCommandHandler: ECRSimulation['addCustomCommandHandler'] = this.simulation.addCustomCommandHandler.bind(this.simulation);
 
