@@ -1,4 +1,4 @@
-import {Structure} from "../../../structure/structure";
+import {WSCStructure} from "../../../typing/WSCStructure";
 import {Constructor} from "../../../utility/types/constructor";
 import {ECRComponent} from "../../state/component/component";
 import {ECRRequest} from "../../query/query";
@@ -17,7 +17,7 @@ export enum ECRResourceSimulationQueryType {
     WRITE    = 2,
 }
 
-export class ECRComponentSimulationSelector<T extends ECRComponent> extends Structure {
+export class ECRComponentSimulationSelector<T extends ECRComponent> extends WSCStructure {
     constructor(
         readonly queryType: ECRComponentSimulationQueryType,
         readonly componentType: Constructor<T>,
