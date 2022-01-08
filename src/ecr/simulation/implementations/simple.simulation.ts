@@ -2,7 +2,6 @@ import {ECRSimulation} from "../simulation.api";
 import {ECRCommandHandler} from "../../command/command-hander";
 import {ECRCommand} from "../../command/command";
 import {ECRRule} from "../../rule/rule";
-import {getClassName} from "../../../utility/functions/get-class-name";
 import {createEntityHandler} from "../../command/built-in/create-entity.command";
 import {deleteEntityHandler} from "../../command/built-in/delete-entity.command";
 import {addComponentHandler} from "../../command/built-in/add-component.command";
@@ -28,6 +27,8 @@ import {
 import {ECRComponent} from "../../state/component/component";
 import {ECRQuery} from "../../query/query";
 import {ECRResource} from "../../state/resource/resource";
+import {getObjectType} from "../../../typing/WSCStructure";
+
 
 export interface WorldStateSnapshot {
     entities: ECREntity[],
@@ -118,7 +119,7 @@ export class SimpleSimulation extends ECRSimulation {
                 const command = commands[i];
 
 
-                const commandHandlerId = handlerTypes.indexOf(getClassName(command));
+                const commandHandlerId = handlerTypes.indexOf(getObjectType(command));
                 if (commandHandlerId !== -1) {
                     const returnedCommands = this.commandHandlers[commandHandlerId].effect(command, this.store);
                     if (returnedCommands && returnedCommands.length > 0) {
@@ -130,9 +131,8 @@ export class SimpleSimulation extends ECRSimulation {
 
                 i++;
             }
-
-            allCommands.push(commands);
-
+          
+            allCommands.push(...commands);
         });
 
         return {

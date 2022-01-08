@@ -1,3 +1,3 @@
-import {Structure} from "../../../structure/structure";
+import {WSCStructure} from "../../../typing/WSCStructure";
 
-export abstract class ECRComponent extends Structure {}
+export abstract class ECRComponent extends WSCStructure {}

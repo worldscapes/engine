@@ -5,7 +5,7 @@ import {WorldStateSnapshot} from "./implementations/simple.simulation";
 
 export abstract class ECRSimulation {
 
-    public abstract runSimulationTick(): { snapshot: WorldStateSnapshot, commands: ECRCommand };
+    public abstract runSimulationTick(): { snapshot: WorldStateSnapshot, commands: ECRCommand[] };
 
     public abstract addRule(rule: ECRRule): void;
 

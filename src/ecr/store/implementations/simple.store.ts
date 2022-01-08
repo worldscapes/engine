@@ -8,6 +8,7 @@ import {
     ECRResourceStoreRequest,
     ECRStoreQuerySubscription
 } from "../request/request";
+import {isTypeOf} from "../../../typing/WSCStructure";
 
 export class ECREntity {
     constructor(
@@ -48,7 +49,7 @@ export class SimpleStore extends ECRStore {
                                 while (i < request.selectors.length) {
                                     const selector = request.selectors[i];
 
-                                    const foundComponent = components.find(component => component instanceof selector.componentType);
+                                    const foundComponent = components.find(component => isTypeOf(component, selector.componentType));
 
                                     if (selector.queryType === ECRComponentStoreQueryType.HAS) {
                                         if (!foundComponent) {

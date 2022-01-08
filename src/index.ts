@@ -137,12 +137,14 @@ const growTreeRule = {
     },
 };
 
-const simulation =  new SimpleSimulation()
+
+const simulation = new SimpleSimulation()
     .addRule(createTreeRule)
     .addRule(growTreeRule);
 
 
-const simulation2 =  new SimpleSimulation()
+
+const simulation2 = new SimpleSimulation()
     .addRule(shuffleCardCollection)
     .addRule(createCardCollection);
 

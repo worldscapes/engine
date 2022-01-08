@@ -17,7 +17,7 @@ export class WorldscapesServer {
                 connectionList
                     .filter(connection => connection.rank === 'client')
                     .forEach((connection) => {
-                        this.network.sendMessageById(connection.id, JSON.stringify(simulationResult.snapshot, null, 4));
+                        this.network.sendMessageById(connection.id, JSON.stringify(simulationResult.snapshot, null, 2));
                     })
             },
             1000,

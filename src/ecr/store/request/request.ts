@@ -1,5 +1,5 @@
 import {ECRComponent} from "../../state/component/component";
-import {Structure} from "../../../structure/structure";
+import {WSCStructure} from "../../../typing/WSCStructure";
 import {Constructor} from "../../../utility/types/constructor";
 import {ECRRequest} from "../../query/query";
 
@@ -13,7 +13,7 @@ export enum ECRComponentStoreQueryType {
     NEEDED   = 2,
 }
 
-export class ECRComponentStoreSelector<T extends ECRComponent> extends Structure {
+export class ECRComponentStoreSelector<T extends ECRComponent> extends WSCStructure {
     constructor(
         readonly queryType: ECRComponentStoreQueryType,
         readonly componentType: Constructor<T>,
