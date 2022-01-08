@@ -137,9 +137,11 @@ const growTreeRule = {
     },
 };
 
+
 const simulation = new SimpleSimulation()
     .addRule(createTreeRule)
     .addRule(growTreeRule);
+
 
 
 const simulation2 = new SimpleSimulation()

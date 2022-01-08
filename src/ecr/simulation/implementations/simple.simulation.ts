@@ -29,6 +29,7 @@ import {ECRQuery} from "../../query/query";
 import {ECRResource} from "../../state/resource/resource";
 import {getObjectType} from "../../../typing/WSCStructure";
 
+
 export interface WorldStateSnapshot {
     entities: ECREntity[],
     components: Record<number, ECRComponent[]>,
@@ -130,9 +131,8 @@ export class SimpleSimulation extends ECRSimulation {
 
                 i++;
             }
-
+          
             allCommands.push(...commands);
-
         });
 
         return {
