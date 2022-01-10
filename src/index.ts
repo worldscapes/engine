@@ -10,10 +10,10 @@ import {
 import {ECRApi} from "./ecr/ecr.api";
 import {SimpleSimulation} from "./ecr/simulation/implementations/simple.simulation";
 import {NetworkServerApi} from "./network/server.api";
-import {LocalServerNetworkAdapter} from "./network/adapter/implementations/local/local-server.adapter";
-import {LocalClientNetworkAdapter} from "./network/adapter/implementations/local/local-client.adapter";
 import {CreateEntityCommand} from "./ecr/command/built-in/create-entity.command";
 import {UpdateComponentCommand} from "./ecr/command/built-in/update-component.command";
+import {WebsocketServerNetworkAdapter} from "./network/adapter/implementations/websocket/websocket-server.adapter";
+import {WebsocketClientNetworkAdapter} from "./network/adapter/implementations/websocket/websocket-client.adapter";
 
 export * from "./server/worldscapes-server.api";
 
@@ -143,7 +143,6 @@ const simulation = new SimpleSimulation()
     .addRule(growTreeRule);
 
 
-
 const simulation2 = new SimpleSimulation()
     .addRule(shuffleCardCollection)
     .addRule(createCardCollection);
@@ -185,15 +184,27 @@ const simulation2 = new SimpleSimulation()
     //     }
     // });
 
-const serverAdapter = new LocalServerNetworkAdapter();
-const clientAdapter = new LocalClientNetworkAdapter(serverAdapter);
+// const serverAdapter = new LocalServerNetworkAdapter();
+// const clientAdapter = new LocalClientNetworkAdapter(serverAdapter);
 
-clientAdapter.onMessage = console.log;
-serverAdapter.onMessage = console.log;
-serverAdapter.sendMessageByRank('client', JSON.stringify({ someTestMessage: 1 }));
-clientAdapter.sendMessageByRank('server', JSON.stringify({ someTestMessage: 1 }));
+const serverAdapter = new WebsocketServerNetworkAdapter();
+const clientAdapter = new WebsocketClientNetworkAdapter('localhost');
 
-new WorldscapesServer(
-    new ECRApi(simulation2),
-    new NetworkServerApi(serverAdapter),
-).run();
+async function init() {
+
+    clientAdapter.onMessage = (data) => { console.log("%s", data) };
+    serverAdapter.onMessage = console.log;
+
+    await serverAdapter.isReady();
+    await clientAdapter.isReady();
+
+    serverAdapter.sendMessageByRank('client', JSON.stringify({someTestMessage: 1}));
+    clientAdapter.sendMessageByRank('server', JSON.stringify({someTestMessage: 1}));
+
+    new WorldscapesServer(
+        new ECRApi(simulation2),
+        new NetworkServerApi(serverAdapter),
+    ).run();
+}
+
+init();
