@@ -2,7 +2,9 @@
   "name": "@worldscapes/engine",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "files": ["/dist"],
+  "files": [
+    "/dist"
+  ],
   "version": "0.0.2",
   "description": "Data-driven framework for game development",
   "keywords": [
@@ -27,7 +29,9 @@
   },
   "dependencies": {
     "@types/node": "^15.12.2",
-    "del-cli": "^4.0.0"
+    "@types/ws": "^8.2.2",
+    "del-cli": "^4.0.0",
+    "ws": "^8.4.0"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^4.26.1",

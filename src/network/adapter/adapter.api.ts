@@ -1,3 +1,5 @@
+import {Resolver} from "../../utility/classes/resolver";
+
 export interface ConnectionInfo {
     id: number,
     rank: 'client' | 'server' | string
@@ -5,6 +7,8 @@ export interface ConnectionInfo {
 
 
 export abstract class NetworkAdapterApi {
+
+    protected readyResolver = new Resolver<void>();
 
     constructor() {
     }
@@ -15,6 +19,10 @@ export abstract class NetworkAdapterApi {
     abstract sendMessageById(targetId: number, messageData: string): void;
     abstract sendMessageByRank(targetRank: string, messageData: string): void;
     abstract getConnectionList(): ConnectionInfo[];
+
+    public isReady(): Promise<void> {
+        return this.readyResolver.promise;
+    }
 
 
 }
