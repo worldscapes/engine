@@ -1,8 +1,8 @@
 import {ECRComponent} from "../state/component/component";
 import {ECRResource} from "../state/resource/resource";
-import {ECREntity} from "./implementations/simple.store";
 import {ECREntityStoreRequest, ECRResourceStoreRequest, ECRStoreQuerySubscription} from "./request/request";
 import {ECRQuery} from "../query/query";
+import {WorldStateSnapshot} from "../simulation/implementations/simple.simulation";
 
 export abstract class ECRStore {
 
@@ -32,9 +32,9 @@ export abstract class ECRStore {
     abstract deleteResource<T extends ECRResource>(resourceName: string): void;
 
 
-    abstract getSnapshot(): { entities: ECREntity[], components: Record<number, ECRComponent[]>, resources: Record<string, ECRResource> };
+    abstract getSnapshot(): WorldStateSnapshot;
 
-    abstract loadSnapshot();
+    abstract loadSnapshot(snapshot: WorldStateSnapshot): void;
 
 }
 

@@ -9,6 +9,7 @@ import {
     ECRStoreQuerySubscription
 } from "../request/request";
 import {isTypeOf} from "../../../typing/WSCStructure";
+import {WorldStateSnapshot} from "../../simulation/implementations/simple.simulation";
 
 export class ECREntity {
     constructor(
@@ -160,8 +161,10 @@ export class SimpleStore extends ECRStore {
         }
     }
 
-    loadSnapshot() {
-        throw Error();
+    loadSnapshot(snapshot: WorldStateSnapshot) {
+        this.entities = snapshot.entities;
+        this.components = snapshot.components;
+        this.resources = snapshot.resources;
     }
 
 }

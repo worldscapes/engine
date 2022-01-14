@@ -1,4 +1,4 @@
-import {ECRSimulation} from "../simulation.api";
+import {ECRSimulationApi} from "../simulation.api";
 import {ECRCommandHandler} from "../../command/command-hander";
 import {ECRCommand} from "../../command/command";
 import {ECRRule} from "../../rule/rule";
@@ -37,7 +37,7 @@ export interface WorldStateSnapshot {
 }
 
 
-export class SimpleSimulation extends ECRSimulation {
+export class SimpleSimulation extends ECRSimulationApi {
 
     protected builtInCommandHandlers: ECRCommandHandler<any>[] = [
         createEntityHandler,
@@ -60,11 +60,12 @@ export class SimpleSimulation extends ECRSimulation {
     protected querySubMap = new Map<ECRRule, ECRStoreQuerySubscription>();
 
     constructor(
-        protected store: ECRStore = new SimpleStore(),
+        readonly store: ECRStore = new SimpleStore(),
     ) {
         super();
     }
 
+    readonly loadSnapshot = this.store.loadSnapshot.bind(this.store);
 
     public runSimulationTick()  {
         console.log("------------------");

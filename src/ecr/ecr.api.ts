@@ -1,13 +1,13 @@
-import {ECRSimulation} from "./simulation/simulation.api";
+import {ECRSimulationApi} from "./simulation/simulation.api";
 
 export class ECRApi {
 
     constructor(
-        protected simulation: ECRSimulation
+        protected simulation: ECRSimulationApi
     ) {}
 
-    readonly runSimulationTick: ECRSimulation['runSimulationTick'] = this.simulation.runSimulationTick.bind(this.simulation);
-    readonly addRule: ECRSimulation['addRule'] = this.simulation.addRule.bind(this.simulation);
-    readonly addCustomCommandHandler: ECRSimulation['addCustomCommandHandler'] = this.simulation.addCustomCommandHandler.bind(this.simulation);
+    readonly runSimulationTick: ECRSimulationApi['runSimulationTick'] = this.simulation.runSimulationTick.bind(this.simulation);
+    readonly addRule: ECRSimulationApi['addRule'] = this.simulation.addRule.bind(this.simulation);
+    readonly addCustomCommandHandler: ECRSimulationApi['addCustomCommandHandler'] = this.simulation.addCustomCommandHandler.bind(this.simulation);
 
 }
