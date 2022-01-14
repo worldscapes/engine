@@ -12,12 +12,12 @@ import {CreateEntityCommand} from "./ecr/command/built-in/create-entity.command"
 import {UpdateComponentCommand} from "./ecr/command/built-in/update-component.command";
 import {WebsocketServerNetworkAdapter} from "./network/adapter/implementations/websocket/websocket-server.adapter";
 import {WebsocketClientNetworkAdapter} from "./network/adapter/implementations/websocket/websocket-client.adapter";
-import {SimpleEngineClient} from "./client/implementations/simple.client";
-import {SimpleEngineServer} from "./server/implementations/simple.server";
+import {SimpleEngineClient} from "./engine/client/implementations/simple.client";
+import {SimpleEngineServer} from "./engine/server/implementations/simple.server";
 import {SimpleNetworkClient} from "./network/client/implementations/client.network";
 import {SimpleNetworkServer} from "./network/server/implementations/server.network";
 
-export * from "./server/worldscapes-server.api";
+export * from "./engine/server/worldscapes-server.api";
 
 class CustomCommand extends ECRCommand {}
 
@@ -197,16 +197,17 @@ async function init() {
     await serverAdapter.isReady();
     await clientAdapter.isReady();
 
-    serverAdapter.sendMessageByRank('client', JSON.stringify({someTestMessage: 1}));
-    clientAdapter.sendMessageByRank('server', JSON.stringify({someTestMessage: 1}));
-
-    new SimpleEngineClient(
-        new SimpleNetworkClient(clientAdapter),
-    );
+    // serverAdapter.sendMessageByRank('client', JSON.stringify({someTestMessage: 1}));
+    // clientAdapter.sendMessageByRank('server', JSON.stringify({someTestMessage: 1}));
 
     new SimpleEngineServer(
         new ECRApi(simulation2),
         new SimpleNetworkServer(serverAdapter),
+    ).start();
+
+    new SimpleEngineClient(
+        new SimpleSimulation(),
+        new SimpleNetworkClient(clientAdapter),
     ).start();
 }
 
