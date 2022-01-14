@@ -1,6 +1,6 @@
-import {NetworkAdapterApi} from "./adapter/adapter.api";
+import {NetworkAdapterApi} from "../../adapter/adapter.api";
 
-export class NetworkServerApi {
+export class SimpleNetworkServer {
 
     constructor(
         protected adapter: NetworkAdapterApi

@@ -18,7 +18,4 @@
   "exclude": [
     "node_modules"
   ],
-  "types": [
-    "babylonjs"
-  ],
 }

@@ -141,7 +141,7 @@ export class SimpleSimulation extends ECRSimulation {
         }
     }
 
-    public addRule(rule: ECRRule) {
+    public addRule(rule: ECRRule): SimpleSimulation {
         this.rules.push(rule);
 
         const storeQuery = this.convertSimulationQueryToStoreQuery(rule.query);
@@ -151,7 +151,7 @@ export class SimpleSimulation extends ECRSimulation {
         return this;
     }
 
-    public addCustomCommandHandler<T extends ECRCommand>(handler: ECRCommandHandler<T>) {
+    public addCustomCommandHandler<T extends ECRCommand>(handler: ECRCommandHandler<T>): SimpleSimulation {
         this.commandHandlers.push(handler);
         return this;
     }

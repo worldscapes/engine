@@ -1,4 +1,4 @@
-export abstract class WorldscapesServerApi {
+export abstract class WorldscapesClientApi {
 
     constructor() {}
 

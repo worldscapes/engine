@@ -1,4 +1,3 @@
-import {WorldscapesServer} from "./server/worldscapes-server.api";
 import {ECRCommand} from "./ecr/command/command";
 import {ECRComponent} from "./ecr/state/component/component";
 import {ECRResource} from "./ecr/state/resource/resource";
@@ -9,11 +8,14 @@ import {
 } from "./ecr/simulation/request/request";
 import {ECRApi} from "./ecr/ecr.api";
 import {SimpleSimulation} from "./ecr/simulation/implementations/simple.simulation";
-import {NetworkServerApi} from "./network/server.api";
 import {CreateEntityCommand} from "./ecr/command/built-in/create-entity.command";
 import {UpdateComponentCommand} from "./ecr/command/built-in/update-component.command";
 import {WebsocketServerNetworkAdapter} from "./network/adapter/implementations/websocket/websocket-server.adapter";
 import {WebsocketClientNetworkAdapter} from "./network/adapter/implementations/websocket/websocket-client.adapter";
+import {SimpleEngineClient} from "./client/implementations/simple.client";
+import {SimpleEngineServer} from "./server/implementations/simple.server";
+import {SimpleNetworkClient} from "./network/client/implementations/client.network";
+import {SimpleNetworkServer} from "./network/server/implementations/server.network";
 
 export * from "./server/worldscapes-server.api";
 
@@ -192,19 +194,20 @@ const clientAdapter = new WebsocketClientNetworkAdapter('localhost');
 
 async function init() {
 
-    clientAdapter.onMessage = (data) => { console.log("%s", data) };
-    serverAdapter.onMessage = console.log;
-
     await serverAdapter.isReady();
     await clientAdapter.isReady();
 
     serverAdapter.sendMessageByRank('client', JSON.stringify({someTestMessage: 1}));
     clientAdapter.sendMessageByRank('server', JSON.stringify({someTestMessage: 1}));
 
-    new WorldscapesServer(
+    new SimpleEngineClient(
+        new SimpleNetworkClient(clientAdapter),
+    );
+
+    new SimpleEngineServer(
         new ECRApi(simulation2),
-        new NetworkServerApi(serverAdapter),
-    ).run();
+        new SimpleNetworkServer(serverAdapter),
+    ).start();
 }
 
 init();
