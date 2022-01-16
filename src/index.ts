@@ -7,7 +7,7 @@ import {
     ECREntitySimulationRequest
 } from "./ecr/simulation/request/request";
 import {ECRApi} from "./ecr/ecr.api";
-import {SimpleSimulation} from "./ecr/simulation/implementations/simple.simulation";
+import {SimpleSimulation, WorldStateSnapshot} from "./ecr/simulation/implementations/simple.simulation";
 import {CreateEntityCommand} from "./ecr/command/built-in/create-entity.command";
 import {UpdateComponentCommand} from "./ecr/command/built-in/update-component.command";
 import {WebsocketServerNetworkAdapter} from "./network/adapter/implementations/websocket/websocket-server.adapter";
@@ -208,6 +208,13 @@ async function init() {
     new SimpleEngineClient(
         new SimpleSimulation(),
         new SimpleNetworkClient(clientAdapter),
+        {
+            onInput: () => {},
+            takeUpdatedSnapshot(snapshot: WorldStateSnapshot) {
+                console.log('------------------------');
+                console.log(snapshot);
+            }
+        }
     ).start();
 }
 
