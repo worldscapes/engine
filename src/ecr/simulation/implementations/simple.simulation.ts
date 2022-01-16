@@ -68,8 +68,6 @@ export class SimpleSimulation extends ECRSimulationApi {
     readonly loadSnapshot = this.store.loadSnapshot.bind(this.store);
 
     public runSimulationTick()  {
-        console.log("------------------");
-
         const handlerTypes = this.commandHandlers.map(handler => handler.commandType);
         const allCommands: ECRCommand[] = [];
 

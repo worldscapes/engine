@@ -3,11 +3,16 @@ import {ECRCommand} from "../command/command";
 import {ECRCommandHandler} from "../command/command-hander";
 import {WorldStateSnapshot} from "./implementations/simple.simulation";
 
+export interface ECRSimulationResult {
+    snapshot: WorldStateSnapshot;
+    commands: ECRCommand[];
+}
+
 export abstract class ECRSimulationApi {
 
     public abstract loadSnapshot(snapshot: WorldStateSnapshot): void;
 
-    public abstract runSimulationTick(): { snapshot: WorldStateSnapshot, commands: ECRCommand[] };
+    public abstract runSimulationTick(): ECRSimulationResult;
 
     public abstract addRule(rule: ECRRule): void;
 
