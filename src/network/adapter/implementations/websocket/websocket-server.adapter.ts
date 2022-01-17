@@ -5,7 +5,7 @@ export class WebsocketServerNetworkAdapter extends NetworkAdapterApi {
 
     protected server: WebSocketServer;
 
-    protected clients = new Map<number, WebSocket>();
+    protected clients = new Map<WebSocket, ConnectionInfo>();
 
     constructor(
         readonly port: number = 7020,
@@ -18,7 +18,12 @@ export class WebsocketServerNetworkAdapter extends NetworkAdapterApi {
 
         this.server.on('connection', (connection) => {
 
-            this.clients.set(Date.now(), connection);
+            this.clients.set(connection, { id: Date.now(), rank: 'client' });
+
+            connection.on('message', (message) => this.onMessage({
+                messageText: message.toString(),
+                connectionInfo: this.clients.get(connection) as ConnectionInfo,
+            }));
 
         });
 
@@ -26,15 +31,12 @@ export class WebsocketServerNetworkAdapter extends NetworkAdapterApi {
     }
 
     getConnectionList(): ConnectionInfo[] {
-        return [...this.clients.keys()].map((key) => ({
-            id: key,
-            rank: 'client'
-        }));
+        return [...this.clients.values()];
     }
 
     sendMessageById(targetId: number, messageData: string): void {
-        const targetConnection = this.clients.get(targetId);
-        targetConnection?.send(messageData);
+        const targetConnection = [ ...this.clients.entries() ].find(([key, value]) => value.id === targetId);
+        targetConnection?.[0].send(messageData);
     }
 
     sendMessageByRank(targetRank: string, messageData: string): void {
@@ -43,7 +45,7 @@ export class WebsocketServerNetworkAdapter extends NetworkAdapterApi {
     }
 
     sendMessageToAll(messageData: string): void {
-        const connections = [... this.clients.values()];
+        const connections = [... this.clients.keys() ];
         connections.forEach(connection => connection.send(messageData));
     }
 

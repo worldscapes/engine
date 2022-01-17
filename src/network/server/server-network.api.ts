@@ -1,10 +1,11 @@
-import {NetworkAdapterApi} from "../adapter/adapter.api";
+import {WorldStateSnapshot} from "../../ecr/simulation/implementations/simple.simulation";
+import {UserInput} from "../../display/display.api";
 
 export abstract class NetworkServerApi {
 
     constructor() {}
 
-    readonly abstract getConnectionList: NetworkAdapterApi['getConnectionList'];
-    readonly abstract sendMessageById: NetworkAdapterApi['sendMessageById'];
+    abstract sendSnapshot(snapshot: WorldStateSnapshot);
+    abstract getUserInput(): Record<string, UserInput[]>;
 
 }

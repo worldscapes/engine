@@ -2,7 +2,7 @@ import {WorldscapesClientApi} from "../worldscapes-client.api";
 import {NetworkClientApi} from "../../../network/client/client-network.api";
 import {ECRSimulationApi} from "../../../ecr/simulation/simulation.api";
 import {setInterval} from "timers";
-import {DisplayApi} from "../../../display/display.api";
+import {DisplayApi, UserInput} from "../../../display/display.api";
 
 export class SimpleEngineClient extends WorldscapesClientApi {
 
@@ -15,10 +15,13 @@ export class SimpleEngineClient extends WorldscapesClientApi {
     }
 
     public start(): void {
-        const unhandledInput: any[] = [];
+        let unhandledInput: UserInput[] = [];
         this.display.onInput = (event) => { unhandledInput.push(event); };
 
         setInterval(() => {
+            // Send accumulated user input to server
+            this.network.sendUserInput(unhandledInput);
+            unhandledInput = [];
 
             // Apply changes from server
             const snapshot = this.network.getLastReceivedSnapshot();
@@ -29,7 +32,7 @@ export class SimpleEngineClient extends WorldscapesClientApi {
             // Run simulation
             const simulationResult = this.simulation.runSimulationTick();
 
-            this.display.takeUpdatedSnapshot(simulationResult.snapshot)
+            this.display.takeUpdatedSnapshot(simulationResult.snapshot);
         }, 1000)
     }
 
