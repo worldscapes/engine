@@ -3,7 +3,7 @@ import { WebSocket } from 'ws';
 
 export class WebsocketClientNetworkAdapter extends NetworkAdapterApi {
 
-    protected client: WebSocket;
+    protected socket!: WebSocket;
 
     constructor(
         readonly url: string,
@@ -11,12 +11,15 @@ export class WebsocketClientNetworkAdapter extends NetworkAdapterApi {
     ) {
         super();
 
-        this.client = new WebSocket(`ws://${this.url}:${this.port}`);
-        this.client.on('open', () => {
+        this.socket = new WebSocket(`ws://${this.url}:${this.port}`);
+        this.socket.on('open', () => {
             this.readyResolver.resolve();
         })
-        this.client.on('message', (message) => {
-            this.onMessage(message.toString());
+        this.socket.on('message', (messageBinaryData) => {
+            this.onMessage({
+                messageText: messageBinaryData.toString(),
+                connectionInfo: this.getConnectionList()[0]
+            });
         });
     }
 
@@ -42,7 +45,7 @@ export class WebsocketClientNetworkAdapter extends NetworkAdapterApi {
     }
 
     protected sendMessageToServer(messageData: string) {
-        this.client.send(messageData);
+        this.socket.send(messageData);
     }
 
 }

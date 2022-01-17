@@ -16,12 +16,7 @@ export class SimpleEngineServer extends WorldscapesServerApi {
             () => {
                 const simulationResult = this.ecr.runSimulationTick();
 
-                const connectionList = this.network.getConnectionList();
-                connectionList
-                    .filter(connection => connection.rank === 'client')
-                    .forEach((connection) => {
-                        this.network.sendMessageById(connection.id, JSON.stringify(simulationResult.snapshot, null, 2));
-                    })
+                this.network.sendSnapshot(simulationResult.snapshot);
             },
             1000,
         );

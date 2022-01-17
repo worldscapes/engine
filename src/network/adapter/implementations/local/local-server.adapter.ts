@@ -39,7 +39,10 @@ export class LocalServerNetworkAdapter extends NetworkAdapterApi {
     }
 
     receiveMessage(messageData: string) {
-        this.onMessage?.(messageData);
+        this.onMessage?.({
+            messageText: messageData,
+            connectionInfo: this.getConnectionList()[0],
+        });
     }
 
     registerClient(clientAdapter: LocalClientNetworkAdapter) {

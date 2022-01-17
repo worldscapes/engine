@@ -14,8 +14,9 @@ import {WebsocketServerNetworkAdapter} from "./network/adapter/implementations/w
 import {WebsocketClientNetworkAdapter} from "./network/adapter/implementations/websocket/websocket-client.adapter";
 import {SimpleEngineClient} from "./engine/client/implementations/simple.client";
 import {SimpleEngineServer} from "./engine/server/implementations/simple.server";
-import {SimpleNetworkClient} from "./network/client/implementations/client.network";
-import {SimpleNetworkServer} from "./network/server/implementations/server.network";
+import {DisplayApi} from "./display/display.api";
+import {SimpleNetworkServer} from "./network/server/implementations/simple.server-network";
+import {SimpleNetworkClient} from "./network/client/implementations/simple.client-network";
 
 export * from "./engine/server/worldscapes-server.api";
 
@@ -192,6 +193,14 @@ const simulation2 = new SimpleSimulation()
 const serverAdapter = new WebsocketServerNetworkAdapter();
 const clientAdapter = new WebsocketClientNetworkAdapter('localhost');
 
+const display: DisplayApi = {
+    onInput: () => {},
+    takeUpdatedSnapshot(snapshot: WorldStateSnapshot) {
+        console.log('------------------------');
+        console.log(snapshot);
+    }
+};
+
 async function init() {
 
     await serverAdapter.isReady();
@@ -208,14 +217,10 @@ async function init() {
     new SimpleEngineClient(
         new SimpleSimulation(),
         new SimpleNetworkClient(clientAdapter),
-        {
-            onInput: () => {},
-            takeUpdatedSnapshot(snapshot: WorldStateSnapshot) {
-                console.log('------------------------');
-                console.log(snapshot);
-            }
-        }
+        display
     ).start();
+
+    setTimeout(() => { display.onInput("Some test input"); }, 2000)
 }
 
 init();
