@@ -16,6 +16,10 @@ export abstract class WSCStructure {
     readonly typeChain: string[] = getChainNames(this);
 }
 
+export function getTypeName<T extends WSCStructure>(constructor: Constructor<T>): string {
+    return constructor.name;
+}
+
 export function getObjectType<T extends WSCStructure>(object: T): string {
     return object.typeChain[0];
 }

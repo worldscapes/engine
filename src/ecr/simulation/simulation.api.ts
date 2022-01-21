@@ -18,4 +18,6 @@ export abstract class ECRSimulationApi {
 
     public abstract addCustomCommandHandler<T extends ECRCommand>(handler: ECRCommandHandler<T>): void;
 
+    public abstract injectCommands(commands: ECRCommand[]): void;
+
 }

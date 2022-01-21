@@ -1,11 +1,12 @@
 import {WorldStateSnapshot} from "../../ecr/simulation/implementations/simple.simulation";
-import {UserInput} from "../../display/display.api";
+import {UserAction} from "../../display/display.api";
+import {UserId} from "../adapter/adapter.api";
 
 export abstract class NetworkServerApi {
 
     constructor() {}
 
     abstract sendSnapshot(snapshot: WorldStateSnapshot);
-    abstract getUserInput(): Record<string, UserInput[]>;
+    abstract getUserInput(): Record<UserId, UserAction[]>;
 
 }

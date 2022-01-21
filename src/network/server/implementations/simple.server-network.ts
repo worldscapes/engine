@@ -1,8 +1,8 @@
-import {NetworkAdapterApi} from "../../adapter/adapter.api";
+import {NetworkAdapterApi, UserId} from "../../adapter/adapter.api";
 import {NetworkServerApi} from "../server-network.api";
 import {WorldStateSnapshot} from "../../../ecr/simulation/implementations/simple.simulation";
 import {NetworkMessageMapper, NetworkMessage} from "../../message/message";
-import {UserInput} from "../../../display/display.api";
+import {UserAction} from "../../../display/display.api";
 import {UserInputMessage} from "../../client/implementations/simple.client-network";
 
 export class UpdatedSnapshotMessage extends NetworkMessage {
@@ -15,7 +15,7 @@ export class UpdatedSnapshotMessage extends NetworkMessage {
 
 export class SimpleNetworkServer extends NetworkServerApi {
 
-    protected accumulatedUserInput: Record<string, UserInput[]> = {};
+    protected accumulatedUserInput: Record<UserId, UserAction[]> = {};
 
     protected mapper = new NetworkMessageMapper();
 
@@ -26,7 +26,7 @@ export class SimpleNetworkServer extends NetworkServerApi {
 
         this.mapper.addMessageHandler(UserInputMessage, ((message, connectionInfo) => {
             this.accumulatedUserInput[connectionInfo.id] = this.accumulatedUserInput[connectionInfo.id] ?? [];
-            this.accumulatedUserInput[connectionInfo.id].push(message);
+            this.accumulatedUserInput[connectionInfo.id].push(...message.input);
         }));
 
         adapter.onMessage = ({ messageText, connectionInfo }) => {
@@ -38,7 +38,7 @@ export class SimpleNetworkServer extends NetworkServerApi {
         this.adapter.sendMessageByRank('client', JSON.stringify(new UpdatedSnapshotMessage(snapshot)));
     }
 
-    getUserInput(): Record<string, UserInput[]> {
+    getUserInput(): Record<UserId, UserAction[]> {
         const input = this.accumulatedUserInput;
         this.accumulatedUserInput = {};
         return input;

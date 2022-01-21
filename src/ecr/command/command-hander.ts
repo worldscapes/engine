@@ -1,6 +1,7 @@
 import {ECRCommand} from "./command";
 import {Constructor} from "../../utility/types/constructor";
 import {ECRStore} from "../store/store.api";
+import {getTypeName} from "../../typing/WSCStructure";
 
 export type ECRCommandEffect<T extends ECRCommand> = (command: T, store: ECRStore) => ECRCommand[] | void;
 
@@ -14,7 +15,7 @@ export function createCommandHandler<T extends ECRCommand>(
     effect: ECRCommandEffect<T>
 ) {
    return {
-       commandType: commandType.name,
+       commandType: getTypeName(commandType),
        effect: effect
    }
 }

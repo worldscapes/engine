@@ -6,6 +6,7 @@ import {
     ECRComponentStoreQueryType,
     ECREntityStoreRequest,
     ECRResourceStoreRequest,
+    ECRStoreQueryResult,
     ECRStoreQuerySubscription
 } from "../request/request";
 import {isTypeOf} from "../../../typing/WSCStructure";
@@ -23,78 +24,81 @@ export class SimpleStore extends ECRStore {
     protected components: Record<number, ECRComponent[]> = {};
     protected resources: Record<string, ECRResource> = {};
 
+    executeQuery(query: ECRQuery<ECREntityStoreRequest | ECRResourceStoreRequest>): ECRStoreQueryResult {
+        const result = {};
+
+        // Handle each query request
+        Object.keys(query).forEach(
+            (requestKey) => {
+                const request = query[requestKey];
+
+                // For Component requests
+                if (request instanceof ECREntityStoreRequest) {
+
+                    const foundEntityComponents: ECRComponent[][] = [];
+
+                    // Check all entities store has
+                    this.entities.forEach(entity => {
+                        const components = this.components[entity.id];
+
+                        // Looks for requested components in given entity
+                        const foundComponents: ECRComponent[] = [];
+                        let allFound = false;
+                        let i = 0;
+                        while (i < request.selectors.length) {
+                            const selector = request.selectors[i];
+
+                            const foundComponent = components.find(component => isTypeOf(component, selector.componentType));
+
+                            if (selector.queryType === ECRComponentStoreQueryType.HAS) {
+                                if (!foundComponent) {
+                                    break;
+                                }
+                            }
+
+                            if (selector.queryType === ECRComponentStoreQueryType.HAS_NOT) {
+                                if (foundComponent) {
+                                    break;
+                                }
+                            }
+
+                            if (selector.queryType === ECRComponentStoreQueryType.NEEDED) {
+                                if (!foundComponent) {
+                                    break;
+                                }
+
+                                foundComponents.push(foundComponent);
+                            }
+
+
+                            i++;
+                            if (i === request.selectors.length) {
+                                allFound = true;
+                            }
+                        }
+
+                        if (allFound) {
+                            foundEntityComponents.push(foundComponents);
+                        }
+                    })
+
+                    result[requestKey] = foundEntityComponents;
+                }
+
+                // For Resource requests
+                if (request instanceof ECRResourceStoreRequest) {
+                    result[requestKey] = this.resources[request.resourceName];
+                }
+            }
+        );
+
+        return result;
+    }
+
     subscribeQuery(query: ECRQuery<ECREntityStoreRequest | ECRResourceStoreRequest>): ECRStoreQuerySubscription {
         return {
             getCurrentData: () => {
-
-                const result = {};
-
-                // Handle each query request
-                Object.keys(query).forEach(
-                    (requestKey) => {
-                        const request = query[requestKey];
-
-                        // For Component requests
-                        if (request instanceof ECREntityStoreRequest) {
-
-                            const foundEntityComponents: ECRComponent[][] = [];
-
-                            // Check all entities store has
-                            this.entities.forEach(entity => {
-                                const components = this.components[entity.id];
-
-                                // Looks for requested components in given entity
-                                const foundComponents: ECRComponent[] = [];
-                                let allFound = false;
-                                let i = 0;
-                                while (i < request.selectors.length) {
-                                    const selector = request.selectors[i];
-
-                                    const foundComponent = components.find(component => isTypeOf(component, selector.componentType));
-
-                                    if (selector.queryType === ECRComponentStoreQueryType.HAS) {
-                                        if (!foundComponent) {
-                                            break;
-                                        }
-                                    }
-
-                                    if (selector.queryType === ECRComponentStoreQueryType.HAS_NOT) {
-                                        if (foundComponent) {
-                                            break;
-                                        }
-                                    }
-
-                                    if (selector.queryType === ECRComponentStoreQueryType.NEEDED) {
-                                        if (!foundComponent) {
-                                            break;
-                                        }
-
-                                        foundComponents.push(foundComponent);
-                                    }
-
-
-                                    i++;
-                                    if (i === request.selectors.length) {
-                                        allFound = true;
-                                    }
-                                }
-
-                                if (allFound) {
-                                    foundEntityComponents.push(foundComponents);
-                                }
-                            })
-
-                            result[requestKey] = foundEntityComponents;
-                        }
-
-                        // For Resource requests
-                        if (request instanceof ECRResourceStoreRequest) {
-                            result[requestKey] = this.resources[request.resourceName];
-                        }
-                    }
-                );
-
-                return result;
+                return this.executeQuery(query);
             },
         }
     }
@@ -142,9 +146,7 @@ export class SimpleStore extends ECRStore {
 
     // Can change a type of resource
     updateResource<T extends ECRResource>(resourceName: string, resource: T): void {
-        if (this.resources[resourceName]) {
-            this.resources[resourceName] = resource;
-        }
+        this.resources[resourceName] = resource;
     }
 
     deleteResource<T extends ECRResource>(resourceName: string): void {
