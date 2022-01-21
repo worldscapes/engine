@@ -3,8 +3,10 @@ import {WSCStructure} from "../../../typing/WSCStructure";
 import {Constructor} from "../../../utility/types/constructor";
 import {ECRRequest} from "../../query/query";
 
+export type ECRStoreQueryResult = Record<string, any>;
+
 export interface ECRStoreQuerySubscription {
-    getCurrentData: () => Record<string, any>,
+    getCurrentData: () => ECRStoreQueryResult,
 }
 
 export enum ECRComponentStoreQueryType {

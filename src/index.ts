@@ -4,9 +4,10 @@ import {ECRResource} from "./ecr/state/resource/resource";
 import {
     ECRComponentSimulationQueryType,
     ECRComponentSimulationSelector,
-    ECREntitySimulationRequest
+    ECREntitySimulationRequest,
+    ECRResourceSimulationQueryType,
+    ECRResourceSimulationRequest
 } from "./ecr/simulation/request/request";
-import {ECRApi} from "./ecr/ecr.api";
 import {SimpleSimulation, WorldStateSnapshot} from "./ecr/simulation/implementations/simple.simulation";
 import {CreateEntityCommand} from "./ecr/command/built-in/create-entity.command";
 import {UpdateComponentCommand} from "./ecr/command/built-in/update-component.command";
@@ -14,9 +15,11 @@ import {WebsocketServerNetworkAdapter} from "./network/adapter/implementations/w
 import {WebsocketClientNetworkAdapter} from "./network/adapter/implementations/websocket/websocket-client.adapter";
 import {SimpleEngineClient} from "./engine/client/implementations/simple.client";
 import {SimpleEngineServer} from "./engine/server/implementations/simple.server";
-import {DisplayApi} from "./display/display.api";
+import {DisplayApi, UserAction} from "./display/display.api";
 import {SimpleNetworkServer} from "./network/server/implementations/simple.server-network";
 import {SimpleNetworkClient} from "./network/client/implementations/simple.client-network";
+import {SimpleECR} from "./ecr/simple-ecr.api";
+import {getTypeName} from "./typing/WSCStructure";
 
 export * from "./engine/server/worldscapes-server.api";
 
@@ -63,19 +66,31 @@ class CardShuffle extends ECRComponent {
     }
 }
 
+class AddOneCardAction extends UserAction {
+
+}
+
 let testCards = [
     {
         name: "six",
         value: 1
     },
     {
+        name: "seven",
+        value: 2
+    },
+    {
         name: "eight",
         value: 3
     },
     {
-        name: "seven",
-        value: 2
-    }
+        name: "nine",
+        value: 4
+    },
+    {
+        name: "ten",
+        value: 5
+    },
 ]
 
 const createCardCollection = {
@@ -84,9 +99,26 @@ const createCardCollection = {
             new ECRComponentSimulationSelector(ECRComponentSimulationQueryType.CHECK, CardShuffle)
         ])
     },
-    condition: ({ cards }) => cards.length < 3,
+    condition: ({ cards }) => cards.length < 1,
     body: () => {
-        return [ new CreateEntityCommand([ new CardShuffle([ ...testCards ]) ]) ];
+        return [ new CreateEntityCommand([ new CardShuffle([]) ]) ];
+    }
+}
+
+const addOneCardOnInput = {
+    query: {
+        addOneActions: new ECRResourceSimulationRequest(ECRResourceSimulationQueryType.CHECK, "action_" + getTypeName(AddOneCardAction)),
+        shuffles: new ECREntitySimulationRequest([
+            new ECRComponentSimulationSelector(ECRComponentSimulationQueryType.WRITE, CardShuffle)
+        ])
+    },
+    condition: ({ addOneActions, shuffles }) => {
+        return addOneActions?.actions && shuffles?.length > 0
+    },
+    body: ({ shuffles }) => {
+        const randomCard = testCards[Math.floor(Math.random() * testCards.length)];
+
+        return [ new UpdateComponentCommand(1, shuffles[0][0], new CardShuffle([ ...shuffles[0][0].cards, randomCard ])) ];
     }
 }
 
@@ -99,8 +131,8 @@ const shuffleCardCollection = {
     condition: ({ cards }) => {
         return cards.length > 0
     },
-    body: (entities) => {
-        return entities.cards.map((entity, index) => {
+    body: (result) => {
+        return result.cards.map((entity, index) => {
             const shuffle = entity
                 .find(component => component instanceof CardShuffle);
             return new UpdateComponentCommand(
@@ -116,76 +148,10 @@ const shuffleCardCollection = {
     }
 }
 
-const createTreeRule = {
-    query: {
-        tree: new ECREntitySimulationRequest([
-            new ECRComponentSimulationSelector(ECRComponentSimulationQueryType.CHECK, TreeTrunk)
-        ]),
-    },
-    condition: ({ tree }) => tree.length === 0,
-    body: () => {
-        return [ new CreateEntityCommand([ new TreeTrunk(1) ]) ];
-    },
-};
-
-const growTreeRule = {
-    query: {
-        tree: new ECREntitySimulationRequest([
-            new ECRComponentSimulationSelector(ECRComponentSimulationQueryType.WRITE, TreeTrunk)
-        ]),
-    },
-    condition: ({ tree }) => tree.length > 0,
-    body: ({ tree }) => {
-        return [ new UpdateComponentCommand(1, tree[0][0], new TreeTrunk(tree[0][0].trunkSize + 1)) ];
-    },
-};
-
-
 const simulation = new SimpleSimulation()
-    .addRule(createTreeRule)
-    .addRule(growTreeRule);
-
-
-const simulation2 = new SimpleSimulation()
     .addRule(shuffleCardCollection)
-    .addRule(createCardCollection);
-
-    // .addRule({
-    //     query: {},
-    //     condition: () => true,
-    //     body: (data) => {
-    //         const chance = Math.random() * 100;
-    //         if (chance < 50) {
-    //             return [ new CreateEntityCommand([ new CustomComponent(chance) ]) ]
-    //         } else {
-    //             return [ new CreateEntityCommand([ new CustomComponent(chance), new CustomComponent2(chance) ]) ]
-    //         }
-    //     }
-    // })
-    // .addRule({
-    //     query: {
-    //         customComponents: new ECREntitySimulationRequest([
-    //             new ECRComponentSimulationSelector(ECRComponentSimulationQueryType.READ, CustomComponent),
-    //             new ECRComponentSimulationSelector(ECRComponentSimulationQueryType.READ, CustomComponent2)
-    //         ])
-    //     },
-    //     condition: () => true,
-    //     body: (data) => {
-    //         console.log(JSON.stringify(data));
-    //     }
-    // })
-    // .addRule({
-    //     query: {
-    //         customComponentsWithHasNot: new ECREntitySimulationRequest([
-    //             new ECRComponentSimulationSelector(ECRComponentSimulationQueryType.READ, CustomComponent),
-    //             new ECRComponentSimulationSelector(ECRComponentSimulationQueryType.HAS_NOT, CustomComponent2)
-    //         ])
-    //     },
-    //     condition: () => true,
-    //     body: (data) => {
-    //         console.log(JSON.stringify(data));
-    //     }
-    // });
+    .addRule(createCardCollection)
+    .addRule(addOneCardOnInput);
 
 // const serverAdapter = new LocalServerNetworkAdapter();
 // const clientAdapter = new LocalClientNetworkAdapter(serverAdapter);
@@ -197,7 +163,7 @@ const display: DisplayApi = {
     onInput: () => {},
     takeUpdatedSnapshot(snapshot: WorldStateSnapshot) {
         console.log('------------------------');
-        console.log(snapshot);
+        console.log(JSON.stringify(snapshot, null, 2));
     }
 };
 
@@ -210,7 +176,7 @@ async function init() {
     // clientAdapter.sendMessageByRank('server', JSON.stringify({someTestMessage: 1}));
 
     new SimpleEngineServer(
-        new ECRApi(simulation2),
+        new SimpleECR(simulation),
         new SimpleNetworkServer(serverAdapter),
     ).start();
 
@@ -220,7 +186,13 @@ async function init() {
         display
     ).start();
 
-    setTimeout(() => { display.onInput("Some test input"); }, 2000)
+    // Mock Input
+    setInterval(() => {
+        const num = Math.random();
+        if (num > 0.5) {
+            display.onInput(new AddOneCardAction());
+        }
+    }, 2000)
 }
 
 init();

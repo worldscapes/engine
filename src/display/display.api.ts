@@ -1,10 +1,11 @@
 import {WorldStateSnapshot} from "../ecr/simulation/implementations/simple.simulation";
+import {WSCStructure} from "../typing/WSCStructure";
 
-export type UserInput = any;
+export abstract class UserAction extends WSCStructure {}
 
 export abstract class DisplayApi {
 
-    onInput!: (event: UserInput) => void;
+    onInput!: (event: UserAction) => void;
 
     abstract takeUpdatedSnapshot(snapshot: WorldStateSnapshot): void;
 

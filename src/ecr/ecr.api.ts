@@ -1,13 +1,10 @@
-import {ECRSimulationApi} from "./simulation/simulation.api";
+import {ECRSimulationResult} from "./simulation/simulation.api";
+import {UserAction} from "../display/display.api";
+import {UserId} from "../network/adapter/adapter.api";
 
-export class ECRApi {
+export abstract class ECRApi {
 
-    constructor(
-        protected simulation: ECRSimulationApi
-    ) {}
-
-    readonly runSimulationTick: ECRSimulationApi['runSimulationTick'] = this.simulation.runSimulationTick.bind(this.simulation);
-    readonly addRule: ECRSimulationApi['addRule'] = this.simulation.addRule.bind(this.simulation);
-    readonly addCustomCommandHandler: ECRSimulationApi['addCustomCommandHandler'] = this.simulation.addCustomCommandHandler.bind(this.simulation);
+    public abstract runSimulationTick(): ECRSimulationResult;
+    public abstract handleUserInput(input: Record<UserId, UserAction[]>): void;
 
 }

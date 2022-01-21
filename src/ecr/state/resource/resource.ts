@@ -1,3 +1,3 @@
 import {WSCStructure} from "../../../typing/WSCStructure";
 
-export class ECRResource extends WSCStructure {}
+export abstract class ECRResource extends WSCStructure {}

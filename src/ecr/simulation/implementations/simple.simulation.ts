@@ -57,6 +57,8 @@ export class SimpleSimulation extends ECRSimulationApi {
         ...this.builtInCommandHandlers
     ];
 
+    protected injectedCommands: ECRCommand[] = [];
+
     protected querySubMap = new Map<ECRRule, ECRStoreQuerySubscription>();
 
     constructor(
@@ -71,6 +73,11 @@ export class SimpleSimulation extends ECRSimulationApi {
         const handlerTypes = this.commandHandlers.map(handler => handler.commandType);
         const allCommands: ECRCommand[] = [];
 
+        // Handle injected commands
+        allCommands.push(...this.handleCommands(this.injectedCommands));
+        this.injectedCommands = [];
+
+        // Handle rules
         this.rules.forEach(rule => {
 
             // Get query data
@@ -111,27 +118,7 @@ export class SimpleSimulation extends ECRSimulationApi {
             // Execute rule
             let commands: ECRCommand[] = rule.body(dataForBody) ?? [];
 
-            // Handle commands
-            let i = 0;
-            while (i < commands.length) {
-
-                const command = commands[i];
-
-
-                const commandHandlerId = handlerTypes.indexOf(getObjectType(command));
-                if (commandHandlerId !== -1) {
-                    const returnedCommands = this.commandHandlers[commandHandlerId].effect(command, this.store);
-                    if (returnedCommands && returnedCommands.length > 0) {
-
-                        // Insert returned commands after current
-                        commands = [ ...commands.slice(0, i + 1), ...returnedCommands, ...commands.slice(i + 1, commands.length) ];
-                    }
-                }
-
-                i++;
-            }
-          
-            allCommands.push(...commands);
+            allCommands.push(...this.handleCommands(commands));
         });
 
         return {
@@ -153,6 +140,36 @@ export class SimpleSimulation extends ECRSimulationApi {
     public addCustomCommandHandler<T extends ECRCommand>(handler: ECRCommandHandler<T>): SimpleSimulation {
         this.commandHandlers.push(handler);
         return this;
+    }
+
+
+    public injectCommands(commands: ECRCommand[]): void {
+        this.injectedCommands.push(...commands);
+    }
+
+    protected handleCommands(commands: ECRCommand[]): ECRCommand[] {
+        let commandQueue: ECRCommand[] = [...commands];
+
+        let i = 0;
+        while (i < commandQueue.length) {
+
+            const command = commandQueue[i];
+            const commandHandler = this.commandHandlers.find(handler => handler.commandType === getObjectType(command));
+
+            if (commandHandler) {
+                const returnedCommands = commandHandler.effect(command, this.store);
+
+                if (returnedCommands && returnedCommands.length > 0) {
+
+                    // Insert returned commands after current
+                    commandQueue = [ ...commandQueue.slice(0, i + 1), ...returnedCommands, ...commandQueue.slice(i + 1, commandQueue.length) ];
+                }
+            }
+
+            i++;
+        }
+
+        return commandQueue;
     }
 
     protected convertSimulationQueryToStoreQuery(

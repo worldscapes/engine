@@ -1,6 +1,11 @@
 import {ECRComponent} from "../state/component/component";
 import {ECRResource} from "../state/resource/resource";
-import {ECREntityStoreRequest, ECRResourceStoreRequest, ECRStoreQuerySubscription} from "./request/request";
+import {
+    ECREntityStoreRequest,
+    ECRResourceStoreRequest,
+    ECRStoreQueryResult,
+    ECRStoreQuerySubscription
+} from "./request/request";
 import {ECRQuery} from "../query/query";
 import {WorldStateSnapshot} from "../simulation/implementations/simple.simulation";
 
@@ -8,6 +13,7 @@ export abstract class ECRStore {
 
     abstract subscribeQuery(query: ECRQuery<ECREntityStoreRequest | ECRResourceStoreRequest>): ECRStoreQuerySubscription;
 
+    abstract executeQuery(query: ECRQuery<ECREntityStoreRequest | ECRResourceStoreRequest>): ECRStoreQueryResult;
 
     abstract createEntity(): number;
 

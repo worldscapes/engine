@@ -2,12 +2,12 @@ import {NetworkAdapterApi} from "../../adapter/adapter.api";
 import {WorldStateSnapshot} from "../../../ecr/simulation/implementations/simple.simulation";
 import {NetworkClientApi} from "../client-network.api";
 import {NetworkMessage, NetworkMessageMapper} from "../../message/message";
-import {UserInput} from "../../../display/display.api";
+import {UserAction} from "../../../display/display.api";
 import {UpdatedSnapshotMessage} from "../../server/implementations/simple.server-network";
 
 export class UserInputMessage extends NetworkMessage {
     constructor(
-        readonly input: UserInput[]
+        readonly input: UserAction[]
     ) {
         super();
     }
@@ -37,7 +37,7 @@ export class SimpleNetworkClient extends NetworkClientApi {
         return this.lastReceivedSnapshot;
     };
 
-    sendUserInput(input: UserInput[]): void {
+    sendUserActions(input: UserAction[]): void {
         this.adapter.sendMessageByRank('server', JSON.stringify(new UserInputMessage(input)));
     }
 
