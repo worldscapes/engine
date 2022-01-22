@@ -3,36 +3,36 @@ import {WSCStructure} from "../../../typing/WSCStructure";
 import {Constructor} from "../../../utility/types/constructor";
 import {ECRRequest} from "../../query/query";
 
-export type ECRStoreQueryResult = Record<string, any>;
+export type StoreQueryResult = Record<string, any>;
 
-export interface ECRStoreQuerySubscription {
-    getCurrentData: () => ECRStoreQueryResult,
+export interface StoreQuerySubscription {
+    getCurrentData: () => StoreQueryResult,
 }
 
-export enum ECRComponentStoreQueryType {
+export enum StoreComponentPurpose {
     HAS      = 0,
     HAS_NOT  = 1,
     NEEDED   = 2,
 }
 
-export class ECRComponentStoreSelector<T extends ECRComponent> extends WSCStructure {
+export class StoreComponentSelector<T extends ECRComponent> extends WSCStructure {
     constructor(
-        readonly queryType: ECRComponentStoreQueryType,
+        readonly queryType: StoreComponentPurpose,
         readonly componentType: Constructor<T>,
     ) {
         super();
     }
 }
 
-export class ECREntityStoreRequest extends ECRRequest {
+export class StoreEntityRequest extends ECRRequest {
     constructor(
-        readonly selectors: ECRComponentStoreSelector<any>[]
+        readonly selectors: StoreComponentSelector<any>[]
     ) {
         super();
     }
 }
 
-export class ECRResourceStoreRequest extends ECRRequest {
+export class StoreResourceRequest extends ECRRequest {
     constructor(
         readonly resourceName: string,
     ) {

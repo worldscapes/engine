@@ -3,11 +3,11 @@ import {ECRComponent} from "../../state/component/component";
 import {ECRResource} from "../../state/resource/resource";
 import {ECRQuery} from "../../query/query";
 import {
-    ECRComponentStoreQueryType,
-    ECREntityStoreRequest,
-    ECRResourceStoreRequest,
-    ECRStoreQueryResult,
-    ECRStoreQuerySubscription
+    StoreComponentPurpose,
+    StoreEntityRequest,
+    StoreResourceRequest,
+    StoreQueryResult,
+    StoreQuerySubscription
 } from "../request/request";
 import {isTypeOf} from "../../../typing/WSCStructure";
 import {WorldStateSnapshot} from "../../simulation/implementations/simple.simulation";
@@ -24,7 +24,7 @@ export class SimpleStore extends ECRStore {
     protected components: Record<number, ECRComponent[]> = {};
     protected resources: Record<string, ECRResource> = {};
 
-    executeQuery(query: ECRQuery<ECREntityStoreRequest | ECRResourceStoreRequest>): ECRStoreQueryResult {
+    executeQuery(query: ECRQuery<StoreEntityRequest | StoreResourceRequest>): StoreQueryResult {
         const result = {};
 
         // Handle each query request
@@ -33,7 +33,7 @@ export class SimpleStore extends ECRStore {
                 const request = query[requestKey];
 
                 // For Component requests
-                if (request instanceof ECREntityStoreRequest) {
+                if (request instanceof StoreEntityRequest) {
 
                     const foundEntityComponents: ECRComponent[][] = [];
 
@@ -50,19 +50,19 @@ export class SimpleStore extends ECRStore {
 
                             const foundComponent = components.find(component => isTypeOf(component, selector.componentType));
 
-                            if (selector.queryType === ECRComponentStoreQueryType.HAS) {
+                            if (selector.queryType === StoreComponentPurpose.HAS) {
                                 if (!foundComponent) {
                                     break;
                                 }
                             }
 
-                            if (selector.queryType === ECRComponentStoreQueryType.HAS_NOT) {
+                            if (selector.queryType === StoreComponentPurpose.HAS_NOT) {
                                 if (foundComponent) {
                                     break;
                                 }
                             }
 
-                            if (selector.queryType === ECRComponentStoreQueryType.NEEDED) {
+                            if (selector.queryType === StoreComponentPurpose.NEEDED) {
                                 if (!foundComponent) {
                                     break;
                                 }
@@ -86,7 +86,7 @@ export class SimpleStore extends ECRStore {
                 }
 
                 // For Resource requests
-                if (request instanceof ECRResourceStoreRequest) {
+                if (request instanceof StoreResourceRequest) {
                     result[requestKey] = this.resources[request.resourceName];
                 }
             }
@@ -95,7 +95,7 @@ export class SimpleStore extends ECRStore {
         return result;
     }
 
-    subscribeQuery(query: ECRQuery<ECREntityStoreRequest | ECRResourceStoreRequest>): ECRStoreQuerySubscription {
+    subscribeQuery(query: ECRQuery<StoreEntityRequest | StoreResourceRequest>): StoreQuerySubscription {
         return {
             getCurrentData: () => {
                 return this.executeQuery(query);

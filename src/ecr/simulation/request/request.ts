@@ -3,7 +3,7 @@ import {Constructor} from "../../../utility/types/constructor";
 import {ECRComponent} from "../../state/component/component";
 import {ECRRequest} from "../../query/query";
 
-export enum ECRComponentSimulationQueryType {
+export enum ComponentPurpose {
     HAS      = 0,
     HAS_NOT  = 1,
     CHECK    = 2,
@@ -11,32 +11,32 @@ export enum ECRComponentSimulationQueryType {
     WRITE    = 4,
 }
 
-export enum ECRResourceSimulationQueryType {
+export enum ResourcePurpose {
     CHECK    = 0,
     READ     = 1,
     WRITE    = 2,
 }
 
-export class ECRComponentSimulationSelector<T extends ECRComponent> extends WSCStructure {
+export class ComponentSelector<T extends ECRComponent> extends WSCStructure {
     constructor(
-        readonly queryType: ECRComponentSimulationQueryType,
+        readonly queryType: ComponentPurpose,
         readonly componentType: Constructor<T>,
     ) {
         super();
     }
 }
 
-export class ECREntitySimulationRequest extends ECRRequest {
+export class EntityRequest extends ECRRequest {
     constructor(
-        readonly selectors: ECRComponentSimulationSelector<any>[]
+        readonly selectors: ComponentSelector<any>[]
     ) {
         super();
     }
 }
 
-export class ECRResourceSimulationRequest extends ECRRequest {
+export class ResourceRequest extends ECRRequest {
     constructor(
-        readonly queryType: ECRResourceSimulationQueryType,
+        readonly queryType: ResourcePurpose,
         readonly resourceName: string,
     ) {
         super();
@@ -44,4 +44,4 @@ export class ECRResourceSimulationRequest extends ECRRequest {
 }
 
 
-export type ECRSimulationQueryType = ECRComponentSimulationQueryType | ECRResourceSimulationQueryType;
+export type ECRSimulationQueryType = ComponentPurpose | ResourcePurpose;
