@@ -2,11 +2,11 @@ import {ECRCommand} from "./ecr/command/command";
 import {ECRComponent} from "./ecr/state/component/component";
 import {ECRResource} from "./ecr/state/resource/resource";
 import {
-    ECRComponentSimulationQueryType,
-    ECRComponentSimulationSelector,
-    ECREntitySimulationRequest,
-    ECRResourceSimulationQueryType,
-    ECRResourceSimulationRequest
+    ComponentPurpose,
+    ComponentSelector,
+    EntityRequest,
+    ResourcePurpose,
+    ResourceRequest
 } from "./ecr/simulation/request/request";
 import {SimpleSimulation, WorldStateSnapshot} from "./ecr/simulation/implementations/simple.simulation";
 import {CreateEntityCommand} from "./ecr/command/built-in/create-entity.command";
@@ -95,11 +95,11 @@ let testCards = [
 
 const createCardCollection = {
     query: {
-        cards: new ECREntitySimulationRequest([
-            new ECRComponentSimulationSelector(ECRComponentSimulationQueryType.CHECK, CardShuffle)
+        cardEntities: new EntityRequest([
+            new ComponentSelector(ComponentPurpose.CHECK, CardShuffle)
         ])
     },
-    condition: ({ cards }) => cards.length < 1,
+    condition: ({ cardEntities }) => cardEntities.length < 1,
     body: () => {
         return [ new CreateEntityCommand([ new CardShuffle([]) ]) ];
     }
@@ -107,9 +107,9 @@ const createCardCollection = {
 
 const addOneCardOnInput = {
     query: {
-        addOneActions: new ECRResourceSimulationRequest(ECRResourceSimulationQueryType.CHECK, "action_" + getTypeName(AddOneCardAction)),
-        shuffles: new ECREntitySimulationRequest([
-            new ECRComponentSimulationSelector(ECRComponentSimulationQueryType.WRITE, CardShuffle)
+        addOneActions: new ResourceRequest(ResourcePurpose.CHECK, "action_" + getTypeName(AddOneCardAction)),
+        shuffles: new EntityRequest([
+            new ComponentSelector(ComponentPurpose.WRITE, CardShuffle)
         ])
     },
     condition: ({ addOneActions, shuffles }) => {
@@ -124,8 +124,8 @@ const addOneCardOnInput = {
 
 const shuffleCardCollection = {
     query: {
-        cards: new ECREntitySimulationRequest([
-            new ECRComponentSimulationSelector(ECRComponentSimulationQueryType.WRITE, CardShuffle)
+        cards: new EntityRequest([
+            new ComponentSelector(ComponentPurpose.WRITE, CardShuffle)
         ])
     },
     condition: ({ cards }) => {

@@ -5,7 +5,7 @@ import {createCommandHandler, ECRCommandHandler} from "./command/command-hander"
 import {ECRCommand} from "./command/command";
 import {UserAction} from "../display/display.api";
 import {getObjectType} from "../typing/WSCStructure";
-import {ECRResourceStoreRequest} from "./store/request/request";
+import {StoreResourceRequest} from "./store/request/request";
 import {UpdateResourceCommand} from "./command/built-in/update-resource.command";
 import {UserActionResource} from "./built-in/resource/UserActionResource";
 import {UserId} from "../network/adapter/adapter.api";
@@ -32,7 +32,7 @@ export class SimpleECR extends ECRApi {
 
                 Object.entries(command.userInput).forEach(([actionName, userActions]) => {
                     const oldResource: UserActionResource<any> | null = store.executeQuery({
-                        oldResource: new ECRResourceStoreRequest(this.actionResourceName(actionName)),
+                        oldResource: new StoreResourceRequest(this.actionResourceName(actionName)),
                     }).oldResource;
 
                     let newActions;
