@@ -14,7 +14,7 @@ export abstract class ECRSimulationApi {
 
     public abstract runSimulationTick(): ECRSimulationResult;
 
-    public abstract addRule(rule: ECRRule): void;
+    public abstract addRule(rule: ECRRule): this;
 
     public abstract addCustomCommandHandler<T extends ECRCommand>(handler: ECRCommandHandler<T>): void;
 

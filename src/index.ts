@@ -1,6 +1,4 @@
-import {ECRCommand} from "./ecr/command/command";
 import {ECRComponent} from "./ecr/state/component/component";
-import {ECRResource} from "./ecr/state/resource/resource";
 import {
     ComponentPurpose,
     ComponentSelector,
@@ -22,33 +20,6 @@ import {SimpleECR} from "./ecr/simple-ecr.api";
 import {getTypeName} from "./typing/WSCStructure";
 
 export * from "./engine/server/worldscapes-server.api";
-
-class CustomCommand extends ECRCommand {}
-
-class CustomComponent extends ECRComponent {
-    constructor(
-        readonly value: number
-    ) {
-        super();
-    }
-}
-
-class CustomComponent2 extends ECRComponent {
-    constructor(
-        readonly value: number
-    ) {
-        super();
-    }
-}
-
-class CustomResource extends ECRResource {
-    constructor(
-        readonly timestamp: number,
-        readonly deleteNextTick: boolean,
-    ) {
-        super();
-    }
-}
 
 class TreeTrunk extends ECRComponent {
     constructor(
