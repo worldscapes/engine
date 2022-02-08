@@ -13,16 +13,16 @@ import {deleteResourceHandler} from "../../command/built-in/delete-resource.comm
 import {ECREntity, SimpleStore} from "../../store/implementations/simple.store";
 import {ECRStore} from "../../store/store.api";
 import {
-    ECRComponentSimulationQueryType,
-    ECREntitySimulationRequest,
-    ECRResourceSimulationQueryType,
-    ECRResourceSimulationRequest
+    ComponentPurpose,
+    EntityRequest,
+    ResourcePurpose,
+    ResourceRequest
 } from "../request/request";
 import {
-    ECRComponentStoreQueryType,
-    ECRComponentStoreSelector,
-    ECREntityStoreRequest,
-    ECRResourceStoreRequest, ECRStoreQuerySubscription
+    StoreComponentPurpose,
+    StoreComponentSelector,
+    StoreEntityRequest,
+    StoreResourceRequest, StoreQuerySubscription
 } from "../../store/request/request";
 import {ECRComponent} from "../../state/component/component";
 import {ECRQuery} from "../../query/query";
@@ -59,7 +59,7 @@ export class SimpleSimulation extends ECRSimulationApi {
 
     protected injectedCommands: ECRCommand[] = [];
 
-    protected querySubMap = new Map<ECRRule, ECRStoreQuerySubscription>();
+    protected querySubMap = new Map<ECRRule, StoreQuerySubscription>();
 
     constructor(
         readonly store: ECRStore = new SimpleStore(),
@@ -92,10 +92,10 @@ export class SimpleSimulation extends ECRSimulationApi {
             const dataForBody = {};
             Object.keys(data).forEach((key) => {
                 const request = rule.query[key];
-                if (request instanceof ECREntitySimulationRequest) {
+                if (request instanceof EntityRequest) {
                     const checkComponentTypes = request
                         .selectors
-                        .filter(selector => selector.queryType === ECRComponentSimulationQueryType.CHECK)
+                        .filter(selector => selector.queryType === ComponentPurpose.CHECK)
                         .map(selector => selector.componentType);
 
                     dataForBody[key] = (data[key] as ECRComponent[][])
@@ -103,8 +103,8 @@ export class SimpleSimulation extends ECRSimulationApi {
                             return entityComponents.filter(component => !checkComponentTypes.includes(Object.getPrototypeOf(component).constructor));
                         });
                 }
-                if (request instanceof ECRResourceSimulationRequest) {
-                    if (request.queryType !== ECRResourceSimulationQueryType.CHECK) {
+                if (request instanceof ResourceRequest) {
+                    if (request.queryType !== ResourcePurpose.CHECK) {
                         dataForBody[key] = data[key];
                     }
                 }
@@ -127,7 +127,7 @@ export class SimpleSimulation extends ECRSimulationApi {
         }
     }
 
-    public addRule(rule: ECRRule): SimpleSimulation {
+    public addRule(rule: ECRRule): this {
         this.rules.push(rule);
 
         const storeQuery = this.convertSimulationQueryToStoreQuery(rule.query);
@@ -173,32 +173,32 @@ export class SimpleSimulation extends ECRSimulationApi {
     }
 
     protected convertSimulationQueryToStoreQuery(
-        query: ECRQuery<ECREntitySimulationRequest | ECRResourceSimulationRequest>
-    ): ECRQuery<ECREntityStoreRequest | ECRResourceStoreRequest>{
+        query: ECRQuery<EntityRequest | ResourceRequest>
+    ): ECRQuery<StoreEntityRequest | StoreResourceRequest>{
         const storeQuery = {};
 
         Object.keys(query).forEach(key => {
 
             const originalRequest = query[key];
 
-            if (originalRequest instanceof ECREntitySimulationRequest) {
+            if (originalRequest instanceof EntityRequest) {
 
                 const selectors = originalRequest.selectors.map(selector => {
-                    if (selector.queryType === ECRComponentSimulationQueryType.HAS_NOT) {
-                        return new ECRComponentStoreSelector(ECRComponentStoreQueryType.HAS_NOT, selector.componentType);
-                    } else if (selector.queryType === ECRComponentSimulationQueryType.HAS) {
-                        return new ECRComponentStoreSelector(ECRComponentStoreQueryType.HAS, selector.componentType);
+                    if (selector.queryType === ComponentPurpose.HAS_NOT) {
+                        return new StoreComponentSelector(StoreComponentPurpose.HAS_NOT, selector.componentType);
+                    } else if (selector.queryType === ComponentPurpose.HAS) {
+                        return new StoreComponentSelector(StoreComponentPurpose.HAS, selector.componentType);
                     } else {
-                        return new ECRComponentStoreSelector(ECRComponentStoreQueryType.NEEDED, selector.componentType);
+                        return new StoreComponentSelector(StoreComponentPurpose.NEEDED, selector.componentType);
                     }
                 });
 
-                storeQuery[key] = new ECREntityStoreRequest(selectors);
+                storeQuery[key] = new StoreEntityRequest(selectors);
             }
 
 
-            if (originalRequest instanceof ECRResourceSimulationRequest) {
-                storeQuery[key] = new ECRResourceStoreRequest(originalRequest.resourceName);
+            if (originalRequest instanceof ResourceRequest) {
+                storeQuery[key] = new StoreResourceRequest(originalRequest.resourceName);
             }
         })
 
