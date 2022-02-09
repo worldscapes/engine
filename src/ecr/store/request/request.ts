@@ -4,6 +4,7 @@ import {Constructor} from "../../../utility/types/constructor";
 import {ECRResource} from "../../state/resource/resource";
 import {EntityRequest, IPurpose} from "../../simulation/request/request";
 
+
 export type StoreQuery = {
     entity: { [key: string]: StoreEntityRequest<any> }
     resource: { [ key: string ]: StoreResourceRequest<any> }
@@ -79,8 +80,6 @@ export namespace StoreComponentSelector {
 }
 
 
-
-
 export class StoreEntityRequest<SelectorsType extends { [ key: string ]: StoreComponentSelector<any, any> }> extends StoreRequest {
     constructor(
         readonly selectors: SelectorsType
@@ -95,8 +94,6 @@ export namespace StoreEntityRequest {
         :
         { [Key in keyof T['selectors']]: StoreComponentSelector.InferComponentType<T['selectors'][Key]> }[];
 }
-
-
 
 
 export class StoreResourceRequest<ResourceType extends ECRResource = ECRResource> extends StoreRequest {

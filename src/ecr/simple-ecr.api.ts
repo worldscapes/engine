@@ -31,6 +31,7 @@ export class SimpleECR extends ECRApi {
                 const resultCommands: ECRCommand[] = []
 
                 Object.entries(command.userInput).forEach(([actionName, userActions]) => {
+
                     const oldResource = store.executeQuery({
                         entity: {},
                         resource: {

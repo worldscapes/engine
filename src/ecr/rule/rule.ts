@@ -9,7 +9,6 @@ import {
 export const ConditionPurposes = [ CheckComponentPurpose, ReadComponentPurpose, WriteComponentPurpose, CheckResourcePurpose, ReadResourcePurpose, WriteResourcePurpose] as const;
 export type ECRRuleCondition<Query extends SimulationQuery> = (data: ExtractSimulationQueryResult<Query, InstanceType<typeof ConditionPurposes[number]>>) => boolean;
 
-
 export const BodyPurposes = [ ReadComponentPurpose, WriteComponentPurpose, ReadResourcePurpose, WriteResourcePurpose] as const;
 export type ECRRuleBody<Query extends SimulationQuery> = (data: ExtractSimulationQueryResult<Query, InstanceType<typeof BodyPurposes[number]>>) => ECRCommand[] | void;
 
@@ -23,4 +22,5 @@ export namespace ECRRule {
         return rule;
     }
 }
+
 

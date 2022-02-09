@@ -3,7 +3,6 @@ import {Constructor} from "../../../utility/types/constructor";
 import {ECRComponent} from "../../state/component/component";
 import {ECRResource} from "../../state/resource/resource";
 
-
 export type SimulationQuery = {
     entity: { [key: string]: EntityRequest<any> }
     resource: { [ key: string ]: ResourceRequest<any, any> }
@@ -115,8 +114,6 @@ export namespace ComponentSelector {
 }
 
 
-
-
 export class EntityRequest<SelectorsType extends { [ key: string ]: ComponentSelector<any, any> }> extends RuleRequest {
     constructor(
         readonly selectors: SelectorsType
@@ -133,8 +130,6 @@ export namespace EntityRequest {
 }
 
 
-
-
 export class ResourceRequest<
     ResourceType extends ECRResource,
     QueryType extends typeof IResourcePurpose
@@ -146,6 +141,7 @@ export class ResourceRequest<
         super();
     }
 }
+
 export namespace ResourceRequest {
     export type Result<T extends ResourceRequest<any, any>> = T extends ResourceRequest<infer R, any> ? R | undefined : never;
 }

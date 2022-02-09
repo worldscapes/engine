@@ -35,6 +35,7 @@ import {
     StoreQuerySubscription,
     StoreResourceRequest,
     StoreReturnComponentPurpose
+
 } from "../../store/request/request";
 import {ECRComponent} from "../../state/component/component";
 import {ECRResource} from "../../state/resource/resource";
@@ -72,6 +73,7 @@ export class SimpleSimulation extends ECRSimulationApi {
 
     protected querySubMap = new Map<ECRRule<any>, StoreQuerySubscription<any>>();
 
+
     constructor(
         readonly store: ECRStore = new SimpleStore(),
     ) {
@@ -101,6 +103,7 @@ export class SimpleSimulation extends ECRSimulationApi {
             const dataForCondition = this.filterResult(data, rule.query, ConditionPurposes);
             // Body - Read, Write
             const dataForBody = this.filterResult(data, rule.query, BodyPurposes);
+
 
 
             // Leave if condition is not fulfilled
@@ -171,6 +174,7 @@ export class SimpleSimulation extends ECRSimulationApi {
             entity: {},
             resource: {}
         }
+
 
         Object.keys(query.entity)
             .forEach((entityKey) => {
