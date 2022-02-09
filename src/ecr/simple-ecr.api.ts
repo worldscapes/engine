@@ -31,9 +31,13 @@ export class SimpleECR extends ECRApi {
                 const resultCommands: ECRCommand[] = []
 
                 Object.entries(command.userInput).forEach(([actionName, userActions]) => {
-                    const oldResource: UserActionResource<any> | null = store.executeQuery({
-                        oldResource: new StoreResourceRequest(this.actionResourceName(actionName)),
-                    }).oldResource;
+
+                    const oldResource = store.executeQuery({
+                        entity: {},
+                        resource: {
+                            oldResource: new StoreResourceRequest<UserActionResource<any>>(this.actionResourceName(actionName)),
+                        }
+                    }).resource.oldResource;
 
                     let newActions;
                     if (oldResource) {
@@ -67,7 +71,7 @@ export class SimpleECR extends ECRApi {
         return this.simulation.runSimulationTick();
     }
 
-    addRule(rule: ECRRule) {
+    addRule(rule: ECRRule<any>) {
         this.simulation.addRule(rule);
     }
 

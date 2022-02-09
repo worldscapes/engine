@@ -1,14 +1,26 @@
 import {ECRCommand} from "../command/command";
-import {ECRQuery} from "../query/query";
-import {EntityRequest, ResourceRequest} from "../simulation/request/request";
+import {
+    SimulationQuery,
+    ExtractSimulationQueryResult,
+    ReadComponentPurpose,
+    WriteComponentPurpose, CheckResourcePurpose, ReadResourcePurpose, WriteResourcePurpose, CheckComponentPurpose,
+} from "../simulation/request/request";
 
-export type ECRRuleCondition = (data: any) => boolean;
-export type ECRRuleBody = (data: any) => ECRCommand[] | void;
+export const ConditionPurposes = [ CheckComponentPurpose, ReadComponentPurpose, WriteComponentPurpose, CheckResourcePurpose, ReadResourcePurpose, WriteResourcePurpose] as const;
+export type ECRRuleCondition<Query extends SimulationQuery> = (data: ExtractSimulationQueryResult<Query, InstanceType<typeof ConditionPurposes[number]>>) => boolean;
 
-export interface ECRRule {
+export const BodyPurposes = [ ReadComponentPurpose, WriteComponentPurpose, ReadResourcePurpose, WriteResourcePurpose] as const;
+export type ECRRuleBody<Query extends SimulationQuery> = (data: ExtractSimulationQueryResult<Query, InstanceType<typeof BodyPurposes[number]>>) => ECRCommand[] | void;
 
-    query: ECRQuery<EntityRequest | ResourceRequest>,
-    condition: ECRRuleCondition,
-    body: ECRRuleBody
-
+export interface ECRRule<QueryType extends SimulationQuery> {
+    query: QueryType,
+    condition: ECRRuleCondition<QueryType>,
+    body: ECRRuleBody<QueryType>
 }
+export namespace ECRRule {
+    export function create<T extends SimulationQuery>(rule: ECRRule<T>) {
+        return rule;
+    }
+}
+
+

@@ -1,16 +1,12 @@
-import {ECRCommand} from "./ecr/command/command";
 import {ECRComponent} from "./ecr/state/component/component";
-import {ECRResource} from "./ecr/state/resource/resource";
 import {
-    ComponentPurpose,
+    CheckComponentPurpose,
+    ComponentPurposes,
     ComponentSelector,
     EntityRequest,
-    ResourcePurpose,
-    ResourceRequest
+    ResourceRequest,
 } from "./ecr/simulation/request/request";
 import {SimpleSimulation, WorldStateSnapshot} from "./ecr/simulation/implementations/simple.simulation";
-import {CreateEntityCommand} from "./ecr/command/built-in/create-entity.command";
-import {UpdateComponentCommand} from "./ecr/command/built-in/update-component.command";
 import {WebsocketServerNetworkAdapter} from "./network/adapter/implementations/websocket/websocket-server.adapter";
 import {WebsocketClientNetworkAdapter} from "./network/adapter/implementations/websocket/websocket-client.adapter";
 import {SimpleEngineClient} from "./engine/client/implementations/simple.client";
@@ -19,44 +15,13 @@ import {DisplayApi, UserAction} from "./display/display.api";
 import {SimpleNetworkServer} from "./network/server/implementations/simple.server-network";
 import {SimpleNetworkClient} from "./network/client/implementations/simple.client-network";
 import {SimpleECR} from "./ecr/simple-ecr.api";
+import {UserActionResource} from "./ecr/built-in/resource/UserActionResource";
+import {ECRRule} from "./ecr/rule/rule";
+import {CreateEntityCommand} from "./ecr/command/built-in/create-entity.command";
 import {getTypeName} from "./typing/WSCStructure";
+import {UpdateComponentCommand} from "./ecr/command/built-in/update-component.command";
 
 export * from "./engine/server/worldscapes-server.api";
-
-class CustomCommand extends ECRCommand {}
-
-class CustomComponent extends ECRComponent {
-    constructor(
-        readonly value: number
-    ) {
-        super();
-    }
-}
-
-class CustomComponent2 extends ECRComponent {
-    constructor(
-        readonly value: number
-    ) {
-        super();
-    }
-}
-
-class CustomResource extends ECRResource {
-    constructor(
-        readonly timestamp: number,
-        readonly deleteNextTick: boolean,
-    ) {
-        super();
-    }
-}
-
-class TreeTrunk extends ECRComponent {
-    constructor(
-        readonly trunkSize: number
-    ) {
-        super();
-    }
-}
 
 class CardShuffle extends ECRComponent {
     constructor(
@@ -93,48 +58,57 @@ let testCards = [
     },
 ]
 
-const createCardCollection = {
+const createCardCollectionRule = ECRRule.create({
     query: {
-        cardEntities: new EntityRequest([
-            new ComponentSelector(ComponentPurpose.CHECK, CardShuffle)
-        ])
+        entity: {
+            entities: new EntityRequest({
+                shuffle: new ComponentSelector(CheckComponentPurpose, CardShuffle)
+            })
+        },
+        resource: {}
     },
-    condition: ({ cardEntities }) => cardEntities.length < 1,
+    condition: ({ entity: { entities } }) => entities.length < 1,
     body: () => {
         return [ new CreateEntityCommand([ new CardShuffle([]) ]) ];
     }
-}
+});
 
-const addOneCardOnInput = {
+
+const addOneCardOnInputRule = ECRRule.create({
     query: {
-        addOneActions: new ResourceRequest(ResourcePurpose.CHECK, "action_" + getTypeName(AddOneCardAction)),
-        shuffles: new EntityRequest([
-            new ComponentSelector(ComponentPurpose.WRITE, CardShuffle)
-        ])
+        entity: {
+            entities: new EntityRequest({
+                shuffle: new ComponentSelector(ComponentPurposes.WRITE, CardShuffle)
+            })
+        },
+        resource: {
+            addOneActions: new ResourceRequest<UserActionResource<AddOneCardAction>, typeof ComponentPurposes.CHECK>(ComponentPurposes.CHECK, "action_" + getTypeName(AddOneCardAction))
+        },
     },
-    condition: ({ addOneActions, shuffles }) => {
-        return addOneActions?.actions && shuffles?.length > 0
+    condition: ({ entity: { entities }, resource: { addOneActions } }) => {
+        return !!addOneActions?.actions && entities?.length > 0
     },
-    body: ({ shuffles }) => {
+    body: ({ resource: {}, entity: { entities } }) => {
         const randomCard = testCards[Math.floor(Math.random() * testCards.length)];
 
-        return [ new UpdateComponentCommand(1, shuffles[0][0], new CardShuffle([ ...shuffles[0][0].cards, randomCard ])) ];
+        return [ new UpdateComponentCommand(1, entities[0].shuffle, new CardShuffle([ ...entities[0].shuffle.cards, randomCard ])) ];
     }
-}
+});
 
-const shuffleCardCollection = {
+const shuffleCardCollectionRule = ECRRule.create({
     query: {
-        cards: new EntityRequest([
-            new ComponentSelector(ComponentPurpose.WRITE, CardShuffle)
-        ])
+        entity: {
+            entities: new EntityRequest({
+                shuffle: new ComponentSelector(ComponentPurposes.WRITE, CardShuffle)
+            })
+        },
+        resource: {}
     },
-    condition: ({ cards }) => {
-        return cards.length > 0
+    condition: ({ entity: { entities } }) => {
+        return entities.length > 0
     },
-    body: (result) => {
-        return result.cards.map((entity, index) => {
-            const shuffle = entity
-                .find(component => component instanceof CardShuffle);
+    body: ({ entity: { entities } }) => {
+        return entities.map(({ shuffle }, index) => {
             return new UpdateComponentCommand(
                 index + 1,
                 shuffle,
@@ -146,12 +120,12 @@ const shuffleCardCollection = {
             )
         });
     }
-}
+});
 
 const simulation = new SimpleSimulation()
-    .addRule(shuffleCardCollection)
-    .addRule(createCardCollection)
-    .addRule(addOneCardOnInput);
+    .addRule(shuffleCardCollectionRule)
+    .addRule(createCardCollectionRule)
+    .addRule(addOneCardOnInputRule);
 
 // const serverAdapter = new LocalServerNetworkAdapter();
 // const clientAdapter = new LocalClientNetworkAdapter(serverAdapter);
@@ -196,3 +170,20 @@ async function init() {
 }
 
 init();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

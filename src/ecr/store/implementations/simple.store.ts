@@ -1,13 +1,15 @@
 import {ECRStore} from "../store.api";
 import {ECRComponent} from "../../state/component/component";
 import {ECRResource} from "../../state/resource/resource";
-import {ECRQuery} from "../../query/query";
 import {
-    StoreComponentPurpose,
     StoreEntityRequest,
     StoreResourceRequest,
     StoreQueryResult,
-    StoreQuerySubscription
+    StoreQuerySubscription,
+    StoreQuery,
+    StoreComponentSelector,
+    StoreReturnComponentPurpose,
+    StoreComponentPurposes
 } from "../request/request";
 import {isTypeOf} from "../../../typing/WSCStructure";
 import {WorldStateSnapshot} from "../../simulation/implementations/simple.simulation";
@@ -24,78 +26,85 @@ export class SimpleStore extends ECRStore {
     protected components: Record<number, ECRComponent[]> = {};
     protected resources: Record<string, ECRResource> = {};
 
-    executeQuery(query: ECRQuery<StoreEntityRequest | StoreResourceRequest>): StoreQueryResult {
-        const result = {};
+    executeQuery<T extends StoreQuery>(query: T): StoreQueryResult<T, StoreReturnComponentPurpose> {
+        const result = {
+            entity: {},
+            resource: {},
+        };
 
         // Handle each query request
-        Object.keys(query).forEach(
+        Object.keys(query.entity).forEach(
             (requestKey) => {
-                const request = query[requestKey];
+                const request: StoreEntityRequest<any> = query.entity[requestKey];
 
-                // For Component requests
-                if (request instanceof StoreEntityRequest) {
+                const foundEntities: StoreEntityRequest.Result<typeof request> = [];
 
-                    const foundEntityComponents: ECRComponent[][] = [];
+                // Check all entities store has
+                this.entities.forEach(entity => {
+                    const components = this.components[entity.id];
 
-                    // Check all entities store has
-                    this.entities.forEach(entity => {
-                        const components = this.components[entity.id];
+                    // Looks for requested components in given entity
+                    const foundComponents: typeof foundEntities[number] = {};
+                    let allFound = false;
+                    let i = 0;
 
-                        // Looks for requested components in given entity
-                        const foundComponents: ECRComponent[] = [];
-                        let allFound = false;
-                        let i = 0;
-                        while (i < request.selectors.length) {
-                            const selector = request.selectors[i];
+                    const selectorKeyArray = Object.keys(request.selectors);
 
-                            const foundComponent = components.find(component => isTypeOf(component, selector.componentType));
+                    while (i < selectorKeyArray.length) {
+                        const key = selectorKeyArray[i];
+                        const selector: StoreComponentSelector<any, any> = request.selectors[key];
 
-                            if (selector.queryType === StoreComponentPurpose.HAS) {
-                                if (!foundComponent) {
-                                    break;
-                                }
-                            }
+                        const foundComponent = components.find(component => isTypeOf(component, selector.componentType));
 
-                            if (selector.queryType === StoreComponentPurpose.HAS_NOT) {
-                                if (foundComponent) {
-                                    break;
-                                }
-                            }
-
-                            if (selector.queryType === StoreComponentPurpose.NEEDED) {
-                                if (!foundComponent) {
-                                    break;
-                                }
-
-                                foundComponents.push(foundComponent);
-                            }
-
-
-                            i++;
-                            if (i === request.selectors.length) {
-                                allFound = true;
+                        if (selector.queryType === StoreComponentPurposes.HAS) {
+                            if (!foundComponent) {
+                                break;
                             }
                         }
 
-                        if (allFound) {
-                            foundEntityComponents.push(foundComponents);
+                        if (selector.queryType === StoreComponentPurposes.HAS_NOT) {
+                            if (foundComponent) {
+                                break;
+                            }
                         }
-                    })
 
-                    result[requestKey] = foundEntityComponents;
-                }
+                        if (selector.queryType === StoreComponentPurposes.RETURN) {
+                            if (!foundComponent) {
+                                break;
+                            }
 
-                // For Resource requests
-                if (request instanceof StoreResourceRequest) {
-                    result[requestKey] = this.resources[request.resourceName];
-                }
+                            foundComponents[key] = foundComponent;
+                        }
+
+
+                        i++;
+                        if (i === selectorKeyArray.length) {
+                            allFound = true;
+                        }
+                    }
+
+                    if (allFound) {
+                        foundEntities.push(foundComponents);
+                    }
+                })
+
+                result.entity[requestKey] = foundEntities;
             }
         );
 
-        return result;
+        // Handle each query request
+        Object.keys(query.resource).forEach(
+            (key) => {
+                const request: StoreResourceRequest<any> = query.resource[key];
+
+                result.resource[key] = this.resources[request.resourceName];
+            }
+        );
+
+        return result as StoreQueryResult<T, StoreReturnComponentPurpose>;
     }
 
-    subscribeQuery(query: ECRQuery<StoreEntityRequest | StoreResourceRequest>): StoreQuerySubscription {
+    subscribeQuery<T extends StoreQuery>(query: T): StoreQuerySubscription<T> {
         return {
             getCurrentData: () => {
                 return this.executeQuery(query);

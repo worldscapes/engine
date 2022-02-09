@@ -1,7 +1,7 @@
 import {ECRSimulationApi} from "../simulation.api";
 import {ECRCommandHandler} from "../../command/command-hander";
 import {ECRCommand} from "../../command/command";
-import {ECRRule} from "../../rule/rule";
+import {BodyPurposes, ConditionPurposes, ECRRule} from "../../rule/rule";
 import {createEntityHandler} from "../../command/built-in/create-entity.command";
 import {deleteEntityHandler} from "../../command/built-in/delete-entity.command";
 import {addComponentHandler} from "../../command/built-in/add-component.command";
@@ -13,19 +13,31 @@ import {deleteResourceHandler} from "../../command/built-in/delete-resource.comm
 import {ECREntity, SimpleStore} from "../../store/implementations/simple.store";
 import {ECRStore} from "../../store/store.api";
 import {
-    ComponentPurpose,
+    CheckComponentPurpose,
+    ComponentSelector,
     EntityRequest,
-    ResourcePurpose,
-    ResourceRequest
+    ExtractSimulationQueryResult,
+    HasComponentPurpose,
+    HasNotComponentPurpose,
+    IComponentPurpose,
+    IResourcePurpose,
+    ReadComponentPurpose, ResourceRequest,
+    SimulationQuery,
+    WriteComponentPurpose
 } from "../request/request";
 import {
-    StoreComponentPurpose,
+    IStoreComponentPurpose,
     StoreComponentSelector,
     StoreEntityRequest,
-    StoreResourceRequest, StoreQuerySubscription
+    StoreHasComponentPurpose,
+    StoreHasNotComponentPurpose,
+    StoreQueryResult,
+    StoreQuerySubscription,
+    StoreResourceRequest,
+    StoreReturnComponentPurpose
+
 } from "../../store/request/request";
 import {ECRComponent} from "../../state/component/component";
-import {ECRQuery} from "../../query/query";
 import {ECRResource} from "../../state/resource/resource";
 import {getObjectType} from "../../../typing/WSCStructure";
 
@@ -52,14 +64,15 @@ export class SimpleSimulation extends ECRSimulationApi {
         deleteResourceHandler,
     ];
 
-    protected rules: ECRRule[] = [];
+    protected rules: ECRRule<any>[] = [];
     protected commandHandlers: ECRCommandHandler<any>[] = [
         ...this.builtInCommandHandlers
     ];
 
     protected injectedCommands: ECRCommand[] = [];
 
-    protected querySubMap = new Map<ECRRule, StoreQuerySubscription>();
+    protected querySubMap = new Map<ECRRule<any>, StoreQuerySubscription<any>>();
+
 
     constructor(
         readonly store: ECRStore = new SimpleStore(),
@@ -87,28 +100,10 @@ export class SimpleSimulation extends ECRSimulationApi {
             }
 
             // Condition - Check, Read, Write
-            const dataForCondition = data;
+            const dataForCondition = this.filterResult(data, rule.query, ConditionPurposes);
             // Body - Read, Write
-            const dataForBody = {};
-            Object.keys(data).forEach((key) => {
-                const request = rule.query[key];
-                if (request instanceof EntityRequest) {
-                    const checkComponentTypes = request
-                        .selectors
-                        .filter(selector => selector.queryType === ComponentPurpose.CHECK)
-                        .map(selector => selector.componentType);
+            const dataForBody = this.filterResult(data, rule.query, BodyPurposes);
 
-                    dataForBody[key] = (data[key] as ECRComponent[][])
-                        .map((entityComponents) => {
-                            return entityComponents.filter(component => !checkComponentTypes.includes(Object.getPrototypeOf(component).constructor));
-                        });
-                }
-                if (request instanceof ResourceRequest) {
-                    if (request.queryType !== ResourcePurpose.CHECK) {
-                        dataForBody[key] = data[key];
-                    }
-                }
-            })
 
 
             // Leave if condition is not fulfilled
@@ -127,7 +122,7 @@ export class SimpleSimulation extends ECRSimulationApi {
         }
     }
 
-    public addRule(rule: ECRRule): SimpleSimulation {
+    public addRule<T extends ECRRule<any>>(rule: T): SimpleSimulation {
         this.rules.push(rule);
 
         const storeQuery = this.convertSimulationQueryToStoreQuery(rule.query);
@@ -173,36 +168,101 @@ export class SimpleSimulation extends ECRSimulationApi {
     }
 
     protected convertSimulationQueryToStoreQuery(
-        query: ECRQuery<EntityRequest | ResourceRequest>
-    ): ECRQuery<StoreEntityRequest | StoreResourceRequest>{
-        const storeQuery = {};
-
-        Object.keys(query).forEach(key => {
-
-            const originalRequest = query[key];
-
-            if (originalRequest instanceof EntityRequest) {
-
-                const selectors = originalRequest.selectors.map(selector => {
-                    if (selector.queryType === ComponentPurpose.HAS_NOT) {
-                        return new StoreComponentSelector(StoreComponentPurpose.HAS_NOT, selector.componentType);
-                    } else if (selector.queryType === ComponentPurpose.HAS) {
-                        return new StoreComponentSelector(StoreComponentPurpose.HAS, selector.componentType);
-                    } else {
-                        return new StoreComponentSelector(StoreComponentPurpose.NEEDED, selector.componentType);
-                    }
-                });
-
-                storeQuery[key] = new StoreEntityRequest(selectors);
-            }
+        query: SimulationQuery
+    ) {
+        const storeQuery = {
+            entity: {},
+            resource: {}
+        }
 
 
-            if (originalRequest instanceof ResourceRequest) {
-                storeQuery[key] = new StoreResourceRequest(originalRequest.resourceName);
-            }
-        })
+        Object.keys(query.entity)
+            .forEach((entityKey) => {
+                const entityRequest = query.entity[entityKey];
+
+                const selectors = {};
+
+                Object.keys(entityRequest.selectors)
+                    .forEach((selectorKey) => {
+                        const selector: ComponentSelector<any, any> = entityRequest.selectors[selectorKey];
+                        selectors[selectorKey] = new StoreComponentSelector(
+                            this.mapComponentPurpose(selector.queryType),
+                            selector.componentType
+                        );
+                    })
+
+                storeQuery.entity[entityKey] = new StoreEntityRequest(selectors);
+            })
+
+        Object.keys(query.resource)
+            .forEach((resourceKey) => {
+                storeQuery.resource[resourceKey] = new StoreResourceRequest(query.resource[resourceKey].resourceName);
+            })
 
         return storeQuery;
+    }
+
+    protected mapComponentPurpose(simulationPurpose: typeof IComponentPurpose): typeof IStoreComponentPurpose {
+        const isCheck = simulationPurpose === CheckComponentPurpose;
+        const isRead = simulationPurpose === ReadComponentPurpose;
+        const isWrite = simulationPurpose === WriteComponentPurpose;
+        const isHas = simulationPurpose === HasComponentPurpose;
+        const isHasNot = simulationPurpose === HasNotComponentPurpose;
+
+        if (isCheck || isRead || isWrite) {
+            return StoreReturnComponentPurpose;
+        }
+
+        if (isHas) {
+            return StoreHasComponentPurpose;
+        }
+
+        if (isHasNot) {
+            return StoreHasNotComponentPurpose;
+        }
+
+        throw Error(`Cannot map unknown SimulationComponentPurpose [${simulationPurpose.name}]`);
+    }
+
+    protected filterResult<
+        T extends SimulationQuery,
+        Purposes extends ReadonlyArray<typeof IComponentPurpose | typeof IResourcePurpose>
+    >(result: StoreQueryResult<any, any>, query: T, allowedPurposes: Purposes)
+    : ExtractSimulationQueryResult<T, InstanceType<Purposes[number]>> {
+
+        let filteredResult  = { entity: {}, resource: {} };
+
+        Object.keys(query.entity).forEach(entityKey => {
+            const entityRequest: EntityRequest<any> = query.entity[entityKey];
+
+            const allowedSelectorKeys: string[] = [];
+
+            Object.keys(entityRequest.selectors).forEach(selectorKey => {
+                const selector: ComponentSelector<any, any> = entityRequest.selectors[selectorKey];
+                const isPurposeAllowed = allowedPurposes.includes(selector.queryType);
+
+                if (isPurposeAllowed) { allowedSelectorKeys.push(selectorKey) }
+            })
+
+            filteredResult.entity[entityKey] = result.entity[entityKey].map(el =>
+                allowedSelectorKeys.reduce(
+                    (acc, key) => {
+                        acc[key] = el[key];
+                        return acc;
+                    },
+                    {}
+                )
+            );
+        });
+
+        Object.keys(query.resource).forEach(resourceKey => {
+            const resourceRequest: ResourceRequest<any, any> = query.resource[resourceKey];
+            const isPurposeAllowed = allowedPurposes.includes(resourceRequest.queryType);
+
+            if (isPurposeAllowed) { filteredResult.resource[resourceKey] = result.resource[resourceKey] }
+        })
+
+        return filteredResult as ExtractSimulationQueryResult<T, InstanceType<Purposes[number]>>;
     }
 
 }

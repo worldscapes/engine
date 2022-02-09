@@ -1,19 +1,16 @@
 import {ECRComponent} from "../state/component/component";
 import {ECRResource} from "../state/resource/resource";
 import {
-    StoreEntityRequest,
-    StoreResourceRequest,
-    StoreQueryResult,
-    StoreQuerySubscription
+    StoreQuerySubscription,
+    StoreQuery,
 } from "./request/request";
-import {ECRQuery} from "../query/query";
 import {WorldStateSnapshot} from "../simulation/implementations/simple.simulation";
 
 export abstract class ECRStore {
 
-    abstract subscribeQuery(query: ECRQuery<StoreEntityRequest | StoreResourceRequest>): StoreQuerySubscription;
+    abstract subscribeQuery<T extends StoreQuery>(query: T): StoreQuerySubscription<T>;
 
-    abstract executeQuery(query: ECRQuery<StoreEntityRequest | StoreResourceRequest>): StoreQueryResult;
+    abstract executeQuery<T extends StoreQuery>(query: T): ReturnType<StoreQuerySubscription<T>['getCurrentData']>;
 
     abstract createEntity(): number;
 
