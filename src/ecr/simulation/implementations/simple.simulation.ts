@@ -127,7 +127,7 @@ export class SimpleSimulation extends ECRSimulationApi {
         }
     }
 
-    public addRule(rule: ECRRule): this {
+    public addRule(rule: ECRRule): SimpleSimulation {
         this.rules.push(rule);
 
         const storeQuery = this.convertSimulationQueryToStoreQuery(rule.query);
