@@ -250,7 +250,7 @@ export class SimpleSimulation extends ECRSimulationApi {
                         acc[key] = el[key];
                         return acc;
                     },
-                    {}
+                    { entityId: el.entityId }
                 )
             );
         });

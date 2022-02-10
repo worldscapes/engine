@@ -92,7 +92,7 @@ export namespace StoreEntityRequest {
     export type Result<T extends EntityRequest<any>> = keyof T['selectors'] extends never ?
         never
         :
-        { [Key in keyof T['selectors']]: StoreComponentSelector.InferComponentType<T['selectors'][Key]> }[];
+        ({ entityId: number } & { [Key in keyof T['selectors']]: StoreComponentSelector.InferComponentType<T['selectors'][Key]> })[];
 }
 
 
