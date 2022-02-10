@@ -27,7 +27,7 @@ export type StoreQueryResult<QueryType extends StoreQuery, AllowedPurposes exten
                     never
                     :
                     SelectorKey
-            >]}
+            >]: QueryType['entity'][EntityKey]['selectors'][SelectorKey] }
         }>
     },
     resource: {

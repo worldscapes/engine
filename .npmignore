@@ -1,0 +1,10 @@
+node_modules
+src
+.idea/
+docs/typedoc/
+testing
+.nodemon
+.github
+.eslintignore
+.eslintrc
+tsconfig.json

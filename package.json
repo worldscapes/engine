@@ -2,9 +2,6 @@
   "name": "@worldscapes/engine",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "files": [
-    "/dist"
-  ],
   "version": "0.0.1",
   "description": "Data-driven framework for game development",
   "homepage": "https://github.com/SFilinsky/worldscapes-engine/wiki/About-Engine",
@@ -21,10 +18,15 @@
   "license": "ISC",
   "scripts": {
     "clear": "del-cli --force ./dist",
-    "build:docs": "typedoc",
-    "start": "nodemon",
-    "start:clean": "npm run clear && npm run start",
+    "clear:testing": "del-cli --force ./dist-testing",
+
     "build": "tsc",
+    "build:docs": "typedoc",
+
+    "start": "nodemon --config .nodemon/nodemon.json",
+    "start:clean": "npm run clear && npm run start",
+
+
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint . --ext .ts --f table",
     "format": "prettier --write \"src/**/*.ts\"",

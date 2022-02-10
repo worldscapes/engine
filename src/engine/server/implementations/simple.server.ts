@@ -1,6 +1,6 @@
 import {ECRApi} from "../../../ecr/ecr.api";
 import {WorldscapesServerApi} from "../worldscapes-server.api";
-import { NetworkServerApi } from "src/network/server/server-network.api";
+import {NetworkServerApi} from "../../../network/server/server-network.api";
 
 export class SimpleEngineServer extends WorldscapesServerApi {
 

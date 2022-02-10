@@ -1,0 +1,18 @@
+{
+  "name": "@worldscapes/testing",
+  "version": "0.0.1",
+  "scripts": {
+    "build": "tsc",
+    "start": "nodemon --config .nodemon/nodemon.json",
+    "start:clean": "npm run clear && npm run start",
+    "clear": "del-cli --force ./dist"
+  },
+  "dependencies": {
+    "@worldscapes/engine": "file:.."
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.7",
+    "prettier": "^2.3.1",
+    "typescript": "^4.3.2"
+  }
+}

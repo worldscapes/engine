@@ -1,7 +1,7 @@
 # dependencies
 node_modules
-/lib
 
 /.idea/
 /docs/typedoc/
 /dist/
+/testing/dist/
