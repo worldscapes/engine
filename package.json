@@ -5,13 +5,19 @@
   "files": [
     "/dist"
   ],
-  "version": "0.0.2",
+  "version": "0.0.1",
   "description": "Data-driven framework for game development",
+  "homepage": "https://github.com/SFilinsky/worldscapes-engine/wiki/About-Engine",
   "keywords": [
-    "babylonjs",
-    "worldscapes"
+    "worldscapes",
+    "game",
+    "engine",
+    "babylonjs"
   ],
-  "author": "Siarhei Filinski (sfilisnky@gmail.com)",
+  "author": {
+    "name": "Siarhei Filinski",
+    "email": "sfilisnky@gmail.com"
+  },
   "license": "ISC",
   "scripts": {
     "clear": "del-cli --force ./dist",
