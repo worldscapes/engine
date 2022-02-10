@@ -4,6 +4,7 @@ import {
     ComponentPurposes,
     ComponentSelector,
     EntityRequest,
+    ResourcePurposes,
     ResourceRequest,
 } from "./ecr/simulation/request/request";
 import {SimpleSimulation, WorldStateSnapshot} from "./ecr/simulation/implementations/simple.simulation";
@@ -20,6 +21,7 @@ import {ECRRule} from "./ecr/rule/rule";
 import {CreateEntityCommand} from "./ecr/command/built-in/create-entity.command";
 import {getTypeName} from "./typing/WSCStructure";
 import {UpdateComponentCommand} from "./ecr/command/built-in/update-component.command";
+import {DeleteResourceCommand} from "./ecr/command/built-in/delete-resource.command";
 
 export * from "./engine/server/worldscapes-server.api";
 
@@ -86,12 +88,14 @@ const addOneCardOnInputRule = ECRRule.create({
         },
     },
     condition: ({ entity: { entities }, resource: { addOneActions } }) => {
-        return !!addOneActions?.actions && entities?.length > 0
+        return !!addOneActions && Object.keys(addOneActions.actions).length > 0 && entities?.length > 0
     },
     body: ({ resource: {}, entity: { entities } }) => {
         const randomCard = testCards[Math.floor(Math.random() * testCards.length)];
 
-        return [ new UpdateComponentCommand(1, entities[0].shuffle, new CardShuffle([ ...entities[0].shuffle.cards, randomCard ])) ];
+        console.log(entities);
+
+        return [ new UpdateComponentCommand(entities[0].entityId, entities[0].shuffle, new CardShuffle([ ...entities[0].shuffle.cards, randomCard ])) ];
     }
 });
 
@@ -122,10 +126,26 @@ const shuffleCardCollectionRule = ECRRule.create({
     }
 });
 
+const clearActionsRule = ECRRule.create({
+    query: {
+        entity: {},
+        resource: {
+            addOneActions: new ResourceRequest<UserActionResource<AddOneCardAction>, typeof ResourcePurposes.WRITE>(ResourcePurposes.WRITE, 'action_' + getTypeName(AddOneCardAction))
+        }
+    },
+    condition: ({ resource: { addOneActions } }) => !!addOneActions && Object.keys(addOneActions.actions).length > 0,
+    body: () => {
+        return [
+            new DeleteResourceCommand('action_' + getTypeName(AddOneCardAction))
+        ]
+    }
+})
+
 const simulation = new SimpleSimulation()
     .addRule(shuffleCardCollectionRule)
     .addRule(createCardCollectionRule)
-    .addRule(addOneCardOnInputRule);
+    .addRule(addOneCardOnInputRule)
+    .addRule(clearActionsRule)
 
 // const serverAdapter = new LocalServerNetworkAdapter();
 // const clientAdapter = new LocalClientNetworkAdapter(serverAdapter);

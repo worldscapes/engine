@@ -46,7 +46,7 @@ export class SimpleECR extends ECRApi {
                                 return {
                                     ...allActions,
                                     [userId]: [
-                                        ...allActions[userId],
+                                        ...(allActions[userId] ?? []),
                                         ...userActions[userId]
                                     ]
                                 }

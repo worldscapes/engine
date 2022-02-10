@@ -44,7 +44,7 @@ export class SimpleStore extends ECRStore {
                     const components = this.components[entity.id];
 
                     // Looks for requested components in given entity
-                    const foundComponents: typeof foundEntities[number] = {};
+                    const foundComponents = { entityId: entity.id };
                     let allFound = false;
                     let i = 0;
 
@@ -84,7 +84,7 @@ export class SimpleStore extends ECRStore {
                     }
 
                     if (allFound) {
-                        foundEntities.push(foundComponents);
+                        foundEntities.push(foundComponents as typeof foundEntities[number]);
                     }
                 })
 
