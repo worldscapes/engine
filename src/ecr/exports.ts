@@ -14,7 +14,6 @@ export * from "./command/built-in/delete-resource.command";
 export * from "./command/built-in/update-component.command";
 export * from "./command/built-in/update-resource.command";
 
-
 export * from "./rule/rule";
 
 export * from "./simulation/simulation.api";
