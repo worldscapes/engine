@@ -1,199 +1,234 @@
 import {
-    CheckComponentPurpose,
-    ComponentPurposes,
-    ComponentSelector,
-    CreateEntityCommand,
-    DeleteResourceCommand,
-    DisplayApi,
-    ECRComponent,
-    ECRRule,
-    EntityRequest,
-    getTypeName,
-    ResourcePurposes,
-    ResourceRequest,
-    SimpleECR,
-    SimpleEngineClient,
-    SimpleEngineServer,
-    SimpleNetworkClient,
-    SimpleNetworkServer,
-    SimpleSimulation,
-    UpdateComponentCommand,
-    UserAction,
-    UserActionResource,
-    WebsocketClientNetworkAdapter,
-    WebsocketServerNetworkAdapter,
-    WorldStateSnapshot
-} from "../../dist";
-
+  CheckComponentPurpose,
+  ComponentPurposes,
+  ComponentSelector,
+  CreateEntityCommand,
+  DeleteResourceCommand,
+  DisplayApi,
+  ECRComponent,
+  ECRRule,
+  EntityRequest,
+  getTypeName,
+  ResourcePurposes,
+  ResourceRequest,
+  SimpleECR,
+  SimpleEngineClient,
+  SimpleEngineServer,
+  SimpleNetworkClient,
+  SimpleNetworkServer,
+  SimpleSimulation,
+  UpdateComponentCommand,
+  UserAction,
+  UserActionResource,
+  WebsocketClientNetworkAdapter,
+  WebsocketServerNetworkAdapter,
+  WorldStateSnapshot,
+} from "@worldscapes/engine";
 
 class CardShuffle extends ECRComponent {
-    constructor(
-        readonly cards: any[] = []
-    ) {
-        super();
-    }
+  constructor(readonly cards: typeof testCards[number][] = []) {
+    super();
+  }
 }
 
-class AddOneCardAction extends UserAction {
+class AddOneCardAction extends UserAction {}
 
+const query = {
+  entity: {
+    shuffles: new EntityRequest({
+      shuffle: new ComponentSelector(ComponentPurposes.WRITE, CardShuffle),
+    }),
+  },
+  resource: {
+    addOneActions: new ResourceRequest<
+        UserActionResource<AddOneCardAction>,
+        typeof ResourcePurposes.CHECK
+        >(ResourcePurposes.CHECK, "test"),
+  },
 }
 
-let testCards = [
-    {
-        name: "six",
-        value: 1
-    },
-    {
-        name: "seven",
-        value: 2
-    },
-    {
-        name: "eight",
-        value: 3
-    },
-    {
-        name: "nine",
-        value: 4
-    },
-    {
-        name: "ten",
-        value: 5
-    },
-]
+const testCards = [
+  {
+    name: "six",
+    value: 1,
+  },
+  {
+    name: "seven",
+    value: 2,
+  },
+  {
+    name: "eight",
+    value: 3,
+  },
+  {
+    name: "nine",
+    value: 4,
+  },
+  {
+    name: "ten",
+    value: 5,
+  },
+];
 
 const createCardCollectionRule = ECRRule.create({
-    query: {
-        entity: {
-            entities: new EntityRequest({
-                shuffle: new ComponentSelector(CheckComponentPurpose, CardShuffle)
-            })
-        },
-        resource: {}
+  query: {
+    entity: {
+      shuffles: new EntityRequest({
+        shuffle: new ComponentSelector(CheckComponentPurpose, CardShuffle),
+      }),
     },
-    condition: ({ entity: { entities } }) => entities.length < 1,
-    body: () => {
-        return [ new CreateEntityCommand([ new CardShuffle([]) ]) ];
-    }
+    resource: {},
+  },
+  condition: ({ entity: { shuffles } }) => shuffles.length < 1,
+  body: () => {
+    return [new CreateEntityCommand([new CardShuffle([])])];
+  },
 });
 
-
 const addOneCardOnInputRule = ECRRule.create({
-    query: {
-        entity: {
-            entities: new EntityRequest({
-                shuffle: new ComponentSelector(ComponentPurposes.WRITE, CardShuffle)
-            })
-        },
-        resource: {
-            addOneActions: new ResourceRequest<UserActionResource<AddOneCardAction>, typeof ComponentPurposes.CHECK>(ComponentPurposes.CHECK, "action_" + getTypeName(AddOneCardAction))
-        },
+  query: {
+    entity: {
+      shuffles: new EntityRequest({
+        shuffle: new ComponentSelector(ComponentPurposes.WRITE, CardShuffle),
+      }),
     },
-    condition: ({ entity: { entities }, resource: { addOneActions } }) => {
-        return !!addOneActions && Object.keys(addOneActions.actions).length > 0 && entities?.length > 0
+    resource: {
+      addOneActions: new ResourceRequest<
+        UserActionResource<AddOneCardAction>,
+        typeof ResourcePurposes.CHECK
+      >(ResourcePurposes.CHECK, "action_" + getTypeName(AddOneCardAction)),
     },
-    body: ({ resource: {}, entity: { entities } }) => {
-        const randomCard = testCards[Math.floor(Math.random() * testCards.length)];
+  },
+  condition: ({ entity: { shuffles }, resource: { addOneActions } }) => {
+    return (
+      !!addOneActions &&
+      Object.keys(addOneActions.actions).length > 0 &&
+      shuffles?.length > 0
+    );
+  },
+  body: ({ entity: { shuffles } }) => {
+    const randomCard = testCards[Math.floor(Math.random() * testCards.length)];
 
-        console.log(entities);
-
-        return [ new UpdateComponentCommand(entities[0].entityId, entities[0].shuffle, new CardShuffle([ ...entities[0].shuffle.cards, randomCard ])) ];
-    }
+    return [
+      new UpdateComponentCommand(
+        shuffles[0].entityId,
+        shuffles[0].shuffle,
+        new CardShuffle([...shuffles[0].shuffle.cards, randomCard])
+      ),
+    ];
+  },
 });
 
 const shuffleCardCollectionRule = ECRRule.create({
-    query: {
-        entity: {
-            entities: new EntityRequest({
-                shuffle: new ComponentSelector(ComponentPurposes.WRITE, CardShuffle)
-            })
-        },
-        resource: {}
+  query: {
+    entity: {
+      shuffles: new EntityRequest({
+        shuffle: new ComponentSelector(ComponentPurposes.WRITE, CardShuffle),
+      }),
     },
-    condition: ({ entity: { entities } }) => {
-        return entities.length > 0
-    },
-    body: ({ entity: { entities } }) => {
-        return entities.map(({ shuffle }, index) => {
-            return new UpdateComponentCommand(
-                index + 1,
-                shuffle,
-                new CardShuffle(
-                    [ ...shuffle.cards ].sort(
-                        (card1, card2) => card1.value - card2.value
-                    )
-                )
-            )
-        });
-    }
+    resource: {},
+  },
+  condition: ({ entity: { shuffles } }) => {
+    return shuffles.length > 0;
+  },
+  body: ({ entity: { shuffles } }) => {
+    return shuffles.map(({ shuffle }, index) => {
+      return new UpdateComponentCommand(
+        index + 1,
+        shuffle,
+        new CardShuffle(
+          [...shuffle.cards].sort((card1, card2) => card1.value - card2.value)
+        )
+      );
+    });
+  },
 });
 
 const clearActionsRule = ECRRule.create({
-    query: {
-        entity: {},
-        resource: {
-            addOneActions: new ResourceRequest<UserActionResource<AddOneCardAction>, typeof ResourcePurposes.WRITE>(ResourcePurposes.WRITE, 'action_' + getTypeName(AddOneCardAction))
-        }
+  query: {
+    entity: {},
+    resource: {
+      addOneActions: new ResourceRequest<
+        UserActionResource<AddOneCardAction>,
+        typeof ResourcePurposes.WRITE
+      >(ResourcePurposes.WRITE, "action_" + getTypeName(AddOneCardAction)),
     },
-    condition: ({ resource: { addOneActions } }) => !!addOneActions && Object.keys(addOneActions.actions).length > 0,
-    body: () => {
-        return [
-            new DeleteResourceCommand('action_' + getTypeName(AddOneCardAction))
-        ]
-    }
-})
+  },
+  condition: ({ entity: {}, resource: { addOneActions } }) =>
+    !!addOneActions && Object.keys(addOneActions.actions).length > 0,
+  body: () => {
+    return [
+      new DeleteResourceCommand("action_" + getTypeName(AddOneCardAction)),
+    ];
+  },
+});
 
+const testRule = ECRRule.create({
+  query: {
+    entity: {
+      test: new EntityRequest({ someComponent: new ComponentSelector(ComponentPurposes.WRITE, CardShuffle) })
+    },
+    resource: {}
+  },
+  condition: () => true,
+  body: () => {},
+});
+
+console.log('Creating simulation instance.');
 const simulation = new SimpleSimulation()
-    .addRule(shuffleCardCollectionRule)
-    .addRule(createCardCollectionRule)
-    .addRule(addOneCardOnInputRule)
-    .addRule(clearActionsRule)
+  .addRule(shuffleCardCollectionRule)
+  .addRule(createCardCollectionRule)
+  .addRule(addOneCardOnInputRule)
+  .addRule(clearActionsRule)
+  .addRule(testRule);
 
 // const serverAdapter = new LocalServerNetworkAdapter();
 // const clientAdapter = new LocalClientNetworkAdapter(serverAdapter);
 
-const serverAdapter = new WebsocketServerNetworkAdapter();
-const clientAdapter = new WebsocketClientNetworkAdapter('localhost');
 
+console.log('Creating adapters.');
+const serverAdapter = new WebsocketServerNetworkAdapter();
+const clientAdapter = new WebsocketClientNetworkAdapter("localhost");
+
+
+console.log('Creating mock display.');
 const display: DisplayApi = {
-    onInput: () => {},
-    takeUpdatedSnapshot(snapshot: WorldStateSnapshot) {
-        console.log('------------------------');
-        console.log(JSON.stringify(snapshot, null, 2));
-    }
+  takeUpdatedSnapshot(snapshot: WorldStateSnapshot) {
+    console.log(snapshot);
+  }
 };
 
 async function init() {
 
-    await serverAdapter.isReady();
-    await clientAdapter.isReady();
+  console.log('Waiting for network adapter connection.');
+  await serverAdapter.isReady();
+  await clientAdapter.isReady();
 
-    // serverAdapter.sendMessageByRank('client', JSON.stringify({someTestMessage: 1}));
-    // clientAdapter.sendMessageByRank('server', JSON.stringify({someTestMessage: 1}));
+  // serverAdapter.sendMessageByRank('client', JSON.stringify({someTestMessage: 1}));
+  // clientAdapter.sendMessageByRank('server', JSON.stringify({someTestMessage: 1}));
 
-    new SimpleEngineServer(
-        new SimpleECR(simulation),
-        new SimpleNetworkServer(serverAdapter),
-    ).start();
+  console.log('Starting Server.');
+  new SimpleEngineServer(
+    new SimpleECR(simulation),
+    new SimpleNetworkServer(serverAdapter)
+  ).start();
 
-    new SimpleEngineClient(
-        new SimpleSimulation(),
-        new SimpleNetworkClient(clientAdapter),
-        display
-    ).start();
+  console.log('Starting Client.');
+  new SimpleEngineClient(
+    new SimpleSimulation(),
+    new SimpleNetworkClient(clientAdapter),
+    display
+  ).start();
 
-    // Mock Input
-    setInterval(() => {
-        const num = Math.random();
-        if (num > 0.5) {
-            display.onInput(new AddOneCardAction());
-        }
-    }, 2000)
+  console.log('Successfully initialized.');
+
+  // Mock Input
+  setInterval(() => {
+    const num = Math.random();
+    if (num > 0.5) {
+      display.onInput?.(new AddOneCardAction());
+    }
+  }, 2000);
 }
 
 init();
-
-
-
-
-
-

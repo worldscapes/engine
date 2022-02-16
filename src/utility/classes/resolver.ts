@@ -4,27 +4,23 @@
  * Mostly used by functions that should resolve after something happens
  */
 export class Resolver<T> {
+  readonly promise: Promise<T>;
 
-    readonly promise: Promise<T>;
+  protected _resolve!: (value: T) => void;
+  protected _reject!: (reason?: unknown) => void;
 
-    protected _resolve: (value: T) => void = () => {
-    };
-    protected _reject: (reason?: any) => void = () => {
-    };
+  get resolve(): (value: T) => void {
+    return this._resolve;
+  }
 
-    get resolve() {
-        return this._resolve;
-    }
+  get reject(): (reason?: unknown) => void {
+    return this._reject;
+  }
 
-    get reject() {
-        return this._reject;
-    }
-
-    constructor() {
-        this.promise = new Promise<T>((resolve, reject) => {
-            this._resolve = resolve;
-            this._reject = reject;
-        })
-    }
-
+  constructor() {
+    this.promise = new Promise<T>((resolve, reject) => {
+      this._resolve = resolve;
+      this._reject = reject;
+    });
+  }
 }

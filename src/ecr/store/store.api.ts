@@ -1,43 +1,54 @@
-import {ECRComponent} from "../state/component/component";
-import {ECRResource} from "../state/resource/resource";
-import {
-    StoreQuerySubscription,
-    StoreQuery,
-} from "./request/request";
-import {WorldStateSnapshot} from "../simulation/implementations/simple.simulation";
+import { ECRComponent } from "../state/component/component";
+import { ECRResource } from "../state/resource/resource";
+import { StoreQuerySubscription, StoreQuery } from "./request/request";
+import { WorldStateSnapshot } from "../simulation/implementations/simple.simulation";
 
 export abstract class ECRStore {
+  abstract subscribeQuery<T extends StoreQuery>(
+    query: T
+  ): StoreQuerySubscription<T>;
 
-    abstract subscribeQuery<T extends StoreQuery>(query: T): StoreQuerySubscription<T>;
+  abstract executeQuery<T extends StoreQuery>(
+    query: T
+  ): ReturnType<StoreQuerySubscription<T>["getCurrentData"]>;
 
-    abstract executeQuery<T extends StoreQuery>(query: T): ReturnType<StoreQuerySubscription<T>['getCurrentData']>;
+  abstract createEntity(): number;
 
-    abstract createEntity(): number;
+  abstract deleteEntity(entityId: number): void;
 
-    abstract deleteEntity(entityId: number): void;
+  abstract addComponent<T extends ECRComponent>(
+    entityId: number,
+    component: T
+  ): void;
 
+  abstract updateComponent<T extends ECRComponent>(
+    entityId: number,
+    oldComponent: T,
+    updatedComponent: T
+  ): void;
 
-    abstract addComponent<T extends ECRComponent>(entityId: number, component: T): void;
+  abstract deleteComponent<T extends ECRComponent>(
+    entityId: number,
+    component: T
+  ): void;
 
-    abstract updateComponent<T extends ECRComponent>(entityId: number, oldComponent: T, updatedComponent: T): void;
+  abstract addResource<T extends ECRResource>(
+    resourceName: string,
+    resource: T
+  ): void;
 
-    abstract deleteComponent<T extends ECRComponent>(entityId: number, component: T): void;
+  /**
+   * @description
+   * **Warning**: Can change a type of resource
+   */
+  abstract updateResource<T extends ECRResource>(
+    resourceName: string,
+    updatedResource: T
+  ): void;
 
+  abstract deleteResource<T extends ECRResource>(resourceName: string): void;
 
-    abstract addResource<T extends ECRResource>(resourceName: string, resource: T): void;
+  abstract getSnapshot(): WorldStateSnapshot;
 
-    /**
-     * @description
-     * **Warning**: Can change a type of resource
-     */
-    abstract updateResource<T extends ECRResource>(resourceName: string, updatedResource: T): void;
-
-    abstract deleteResource<T extends ECRResource>(resourceName: string): void;
-
-
-    abstract getSnapshot(): WorldStateSnapshot;
-
-    abstract loadSnapshot(snapshot: WorldStateSnapshot): void;
-
+  abstract loadSnapshot(snapshot: WorldStateSnapshot): void;
 }
-

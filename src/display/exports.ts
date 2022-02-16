@@ -1,1 +1,1 @@
-export * from "./display.api"
+export * from "./display.api";

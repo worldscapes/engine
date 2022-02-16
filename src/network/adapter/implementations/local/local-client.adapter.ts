@@ -1,49 +1,44 @@
-import {ConnectionInfo, NetworkAdapterApi} from "../../adapter.api";
-import {LocalServerNetworkAdapter} from "./local-server.adapter";
+import { ConnectionInfo, NetworkAdapterApi } from "../../adapter.api";
+import { LocalServerNetworkAdapter } from "./local-server.adapter";
 
 export class LocalClientNetworkAdapter extends NetworkAdapterApi {
+  constructor(protected serverAdapter?: LocalServerNetworkAdapter) {
+    super();
 
-
-    constructor(
-        protected serverAdapter?: LocalServerNetworkAdapter
-    ) {
-        super();
-
-        if (serverAdapter) {
-            serverAdapter.registerClient(this);
-        }
+    if (serverAdapter) {
+      serverAdapter.registerClient(this);
     }
+  }
 
-    getConnectionList(): ConnectionInfo[] {
-        return [
-            {
-                id: 1,
-                rank: 'server'
-            }
-        ];
-    }
+  getConnectionList(): ConnectionInfo[] {
+    return [
+      {
+        id: 1,
+        rank: "server",
+      },
+    ];
+  }
 
-    sendMessageById(targetId: number, messageData: string): void {
-        this.sendMessageToServer(messageData);
-    }
+  sendMessageById(targetId: number, messageData: string): void {
+    this.sendMessageToServer(messageData);
+  }
 
-    sendMessageByRank(targetRank: string, messageData: string): void {
-        this.sendMessageToServer(messageData);
-    }
+  sendMessageByRank(targetRank: string, messageData: string): void {
+    this.sendMessageToServer(messageData);
+  }
 
-    sendMessageToAll(messageData: string): void {
-        this.sendMessageToServer(messageData);
-    }
+  sendMessageToAll(messageData: string): void {
+    this.sendMessageToServer(messageData);
+  }
 
-    protected sendMessageToServer(messageData: string) {
-        this.serverAdapter?.receiveMessage(messageData);
-    }
+  protected sendMessageToServer(messageData: string): void {
+    this.serverAdapter?.receiveMessage(messageData);
+  }
 
-    receiveMessage(messageData: string) {
-        this.onMessage?.({
-            messageText: messageData,
-            connectionInfo: this.getConnectionList()[0],
-        });
-    }
-
+  receiveMessage(messageData: string): void {
+    this.onMessage?.({
+      messageText: messageData,
+      connectionInfo: this.getConnectionList()[0],
+    });
+  }
 }

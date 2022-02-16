@@ -1,21 +1,27 @@
-import {ECRCommand} from "./command";
-import {Constructor} from "../../utility/types/constructor";
-import {ECRStore} from "../store/store.api";
-import {getTypeName} from "../../typing/WSCStructure";
+import { ECRCommand } from "./command";
+import { Constructor } from "../../utility/types/constructor";
+import { ECRStore } from "../store/store.api";
+import { getTypeName } from "../../typing/WSCStructure";
 
-export type ECRCommandEffect<T extends ECRCommand> = (command: T, store: ECRStore) => ECRCommand[] | void;
+export namespace ECRCommandEffect {
+  export type InferCommandType<T extends ECRCommandEffect> = T extends ECRCommandEffect<infer R> ? R : never;
+}
+export type ECRCommandEffect<CommandType extends ECRCommand = ECRCommand> = (
+  command: CommandType,
+  store: ECRStore
+) => ECRCommand[] | void;
 
-export interface ECRCommandHandler<T extends ECRCommand> {
-    commandType: string,
-    effect: ECRCommandEffect<T>,
+export interface ECRCommandHandler<EffectType extends ECRCommandEffect = ECRCommandEffect> {
+  commandType: string;
+  effect: EffectType;
 }
 
-export function createCommandHandler<T extends ECRCommand>(
-    commandType: Constructor<T>,
-    effect: ECRCommandEffect<T>
-) {
-   return {
-       commandType: getTypeName(commandType),
-       effect: effect
-   }
+export function createCommandHandler<CommandType extends ECRCommand>(
+  commandType: Constructor<CommandType>,
+  effect: ECRCommandEffect<CommandType>,
+): ECRCommandHandler {
+  return {
+    commandType: getTypeName(commandType),
+    effect: effect as ECRCommandEffect,
+  };
 }
