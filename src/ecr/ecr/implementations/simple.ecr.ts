@@ -1,5 +1,7 @@
-import {ECRSimulationApi, ECRSimulationResult} from "../simulation.api";
-import {ECRCommandEffect, ECRCommandHandler} from "../../command/command-hander";
+import {
+  ECRCommandEffect,
+  ECRCommandHandler,
+} from "../../command/command-hander";
 import { ECRCommand } from "../../command/command";
 import { BodyPurposes, ConditionPurposes, ECRRule } from "../../rule/rule";
 import { createEntityHandler } from "../../command/built-in/create-entity.command";
@@ -19,22 +21,24 @@ import {
   CheckComponentPurpose,
   ComponentSelector,
   EntityRequest,
-  ExtractSimulationQueryResult,
+  ECRQueryResult,
   HasComponentPurpose,
   HasNotComponentPurpose,
   IComponentPurpose,
   IResourcePurpose,
   ReadComponentPurpose,
   ResourceRequest,
-  SimulationQuery,
+  ECRQuery,
   WriteComponentPurpose,
 } from "../request/request";
 import {
-  IStoreComponentPurpose, IStorePurpose,
+  IStoreComponentPurpose,
+  IStorePurpose,
   StoreComponentSelector,
   StoreEntityRequest,
   StoreHasComponentPurpose,
-  StoreHasNotComponentPurpose, StoreQuery,
+  StoreHasNotComponentPurpose,
+  StoreQuery,
   StoreQueryResult,
   StoreQuerySubscription,
   StoreResourceRequest,
@@ -43,6 +47,7 @@ import {
 import { ECRComponent } from "../../state/component/component";
 import { ECRResource } from "../../state/resource/resource";
 import { getObjectType } from "../../../typing/WSCStructure";
+import { ECRApi, ECRTickResult } from "../ecr.api";
 
 export interface WorldStateSnapshot {
   entities: ECREntity[];
@@ -50,7 +55,7 @@ export interface WorldStateSnapshot {
   resources: Record<string, ECRResource>;
 }
 
-export class SimpleSimulation extends ECRSimulationApi {
+export class SimpleEcr extends ECRApi {
   protected builtInCommandHandlers: ECRCommandHandler[] = [
     createEntityHandler,
     deleteEntityHandler,
@@ -79,7 +84,7 @@ export class SimpleSimulation extends ECRSimulationApi {
 
   readonly loadSnapshot = this.store.loadSnapshot.bind(this.store);
 
-  public runSimulationTick(): ECRSimulationResult {
+  public runSimulationTick(): ECRTickResult {
     const handlerTypes = this.commandHandlers.map(
       (handler) => handler.commandType
     );
@@ -122,19 +127,22 @@ export class SimpleSimulation extends ECRSimulationApi {
     };
   }
 
-  public addRule<T extends SimulationQuery>(rule: ECRRule<T>): SimpleSimulation {
+  public addRule<T extends ECRQuery>(rule: ECRRule<T>): SimpleEcr {
     this.rules.push(rule as unknown as ECRRule);
 
     const storeQuery = this.convertSimulationQueryToStoreQuery(rule.query);
 
-    this.querySubMap.set(rule as unknown as ECRRule, this.store.subscribeQuery(storeQuery));
+    this.querySubMap.set(
+      rule as unknown as ECRRule,
+      this.store.subscribeQuery(storeQuery)
+    );
 
     return this;
   }
 
   public addCustomCommandHandler<T extends ECRCommandEffect>(
     handler: ECRCommandHandler<T>
-  ): SimpleSimulation {
+  ): SimpleEcr {
     this.commandHandlers.push(handler);
     return this;
   }
@@ -172,7 +180,7 @@ export class SimpleSimulation extends ECRSimulationApi {
     return commandQueue;
   }
 
-  protected convertSimulationQueryToStoreQuery(query: SimulationQuery): StoreQuery {
+  protected convertSimulationQueryToStoreQuery(query: ECRQuery): StoreQuery {
     const storeQuery = {
       entity: {},
       resource: {},
@@ -231,7 +239,7 @@ export class SimpleSimulation extends ECRSimulationApi {
   }
 
   protected filterResult<
-    T extends SimulationQuery,
+    T extends ECRQuery,
     Purposes extends ReadonlyArray<
       typeof IComponentPurpose | typeof IResourcePurpose
     >
@@ -239,7 +247,7 @@ export class SimpleSimulation extends ECRSimulationApi {
     result: StoreQueryResult<T, IStorePurpose>,
     query: T,
     allowedPurposes: Purposes
-  ): ExtractSimulationQueryResult<T, InstanceType<Purposes[number]>> {
+  ): ECRQueryResult<T, InstanceType<Purposes[number]>> {
     const filteredResult = { entity: {}, resource: {} };
 
     Object.keys(query.entity).forEach((entityKey) => {
@@ -269,8 +277,7 @@ export class SimpleSimulation extends ECRSimulationApi {
     });
 
     Object.keys(query.resource).forEach((resourceKey) => {
-      const resourceRequest: ResourceRequest =
-        query.resource[resourceKey];
+      const resourceRequest: ResourceRequest = query.resource[resourceKey];
       const isPurposeAllowed = allowedPurposes.includes(
         resourceRequest.queryType
       );
@@ -280,9 +287,6 @@ export class SimpleSimulation extends ECRSimulationApi {
       }
     });
 
-    return filteredResult as ExtractSimulationQueryResult<
-      T,
-      InstanceType<Purposes[number]>
-    >;
+    return filteredResult as ECRQueryResult<T, InstanceType<Purposes[number]>>;
   }
 }

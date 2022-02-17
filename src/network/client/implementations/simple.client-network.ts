@@ -1,5 +1,5 @@
 import { NetworkAdapterApi } from "../../adapter/adapter.api";
-import { WorldStateSnapshot } from "../../../ecr/simulation/implementations/simple.simulation";
+import { WorldStateSnapshot } from "../../../ecr/ecr/implementations/simple.ecr";
 import { NetworkClientApi } from "../client-network.api";
 import { NetworkMessage, NetworkMessageMapper } from "../../message/message";
 import { UserAction } from "../../../display/display.api";

@@ -3,21 +3,21 @@ import { Constructor } from "../../../utility/types/constructor";
 import { ECRComponent } from "../../state/component/component";
 import { ECRResource } from "../../state/resource/resource";
 
-export type SimulationQuery<
-    E extends { [key: string]: EntityRequest } = Record<string, never>,
-    R extends { [key: string]: ResourceRequest } = Record<string, never>,
+export type ECRQuery<
+  E extends { [key: string]: EntityRequest } = Record<string, never>,
+  R extends { [key: string]: ResourceRequest } = Record<string, never>
 > = {
   entity: { [key: string]: EntityRequest };
   resource: { [key: string]: ResourceRequest };
 };
-export namespace SimulationQuery {
-  export function create<T extends SimulationQuery>(query: T): T {
+export namespace ECRQuery {
+  export function create<T extends ECRQuery>(query: T): T {
     return query;
   }
 }
 
-export type ExtractSimulationQueryResult<
-  QueryType extends SimulationQuery,
+export type ECRQueryResult<
+  QueryType extends ECRQuery,
   AllowedRequestPurpose extends IPurpose
 > = {
   entity: {
@@ -108,25 +108,28 @@ export namespace ComponentSelector {
 }
 
 export class EntityRequest<
-  SelectorsType extends { [key: string]: ComponentSelector } = { [key: string]: ComponentSelector }
+  SelectorsType extends { [key: string]: ComponentSelector } = {
+    [key: string]: ComponentSelector;
+  }
 > extends RuleRequest {
   constructor(readonly selectors: SelectorsType) {
     super();
   }
 }
 export namespace EntityRequest {
-  export type InferSelector<T extends EntityRequest> =
-    T extends EntityRequest<infer R> ? R : never;
+  export type InferSelector<T extends EntityRequest> = T extends EntityRequest<
+    infer R
+  >
+    ? R
+    : never;
   export type Result<T extends EntityRequest> =
     keyof T["selectors"] extends never
       ? never
-      :
-      (
-        { entityId: number }
-        & {
-          [Key in keyof T["selectors"]]: ComponentSelector.InferComponentType<T["selectors"][Key]>;
-        }
-      )[];
+      : ({ entityId: number } & {
+          [Key in keyof T["selectors"]]: ComponentSelector.InferComponentType<
+            T["selectors"][Key]
+          >;
+        })[];
 }
 
 export class ResourceRequest<
@@ -139,6 +142,10 @@ export class ResourceRequest<
 }
 
 export namespace ResourceRequest {
-  export type Result<T extends ResourceRequest> =
-    T extends ResourceRequest<infer R, typeof IResourcePurpose> ? R | undefined : never;
+  export type Result<T extends ResourceRequest> = T extends ResourceRequest<
+    infer R,
+    typeof IResourcePurpose
+  >
+    ? R | undefined
+    : never;
 }

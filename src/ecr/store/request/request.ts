@@ -2,7 +2,7 @@ import { ECRComponent } from "../../state/component/component";
 import { WSCStructure } from "../../../typing/WSCStructure";
 import { Constructor } from "../../../utility/types/constructor";
 import { ECRResource } from "../../state/resource/resource";
-import { IPurpose } from "../../simulation/request/request";
+import { IPurpose } from "../../ecr/request/request";
 
 export type StoreQuery = {
   entity: { [key: string]: StoreEntityRequest };
@@ -84,7 +84,9 @@ export namespace StoreComponentSelector {
 }
 
 export class StoreEntityRequest<
-  SelectorsType extends { [key: string]: StoreComponentSelector } = { [key: string]: StoreComponentSelector }
+  SelectorsType extends { [key: string]: StoreComponentSelector } = {
+    [key: string]: StoreComponentSelector;
+  }
 > extends StoreRequest {
   constructor(readonly selectors: SelectorsType) {
     super();

@@ -1,16 +1,16 @@
-import { ECRApi } from "./ecr.api";
-import {ECRSimulationApi, ECRSimulationResult} from "./simulation/simulation.api";
 import {
   createCommandHandler,
   ECRCommandHandler,
-} from "./command/command-hander";
-import { ECRCommand } from "./command/command";
-import { UserAction } from "../display/display.api";
-import { getObjectType } from "../typing/WSCStructure";
-import { StoreResourceRequest } from "./store/request/request";
-import { UpdateResourceCommand } from "./command/built-in/update-resource.command";
-import { UserActionResource } from "./built-in/resource/UserActionResource";
-import { UserId } from "../network/adapter/adapter.api";
+} from "../../../../ecr/command/command-hander";
+import { ECRCommand } from "../../../../ecr/command/command";
+import { UserAction } from "../../../../display/display.api";
+import { getObjectType } from "../../../../typing/WSCStructure";
+import { StoreResourceRequest } from "../../../../ecr/store/request/request";
+import { UpdateResourceCommand } from "../../../../ecr/command/built-in/update-resource.command";
+import { UserActionResource } from "../../../../ecr/built-in/resource/UserActionResource";
+import { UserId } from "../../../../network/adapter/adapter.api";
+import { ServerSimulationApi } from "../server-simulation.api";
+import { ECRApi, ECRTickResult } from "../../../../ecr/ecr/ecr.api";
 
 class AddInputCommand extends ECRCommand {
   constructor(
@@ -20,11 +20,11 @@ class AddInputCommand extends ECRCommand {
   }
 }
 
-export class SimpleECR extends ECRApi {
-  constructor(protected simulation: ECRSimulationApi) {
+export class SimpleServerSimulation extends ServerSimulationApi {
+  constructor(protected ecr: ECRApi) {
     super();
 
-    simulation.addCustomCommandHandler(
+    ecr.addCustomCommandHandler(
       createCommandHandler(AddInputCommand, (command, store) => {
         const resultCommands: ECRCommand[] = [];
 
@@ -73,12 +73,12 @@ export class SimpleECR extends ECRApi {
     );
   }
 
-  runSimulationTick(): ECRSimulationResult {
-    return this.simulation.runSimulationTick();
+  runSimulationTick(): ECRTickResult {
+    return this.ecr.runSimulationTick();
   }
 
   addCustomCommandHandler(handler: ECRCommandHandler): void {
-    this.simulation.addCustomCommandHandler(handler);
+    this.ecr.addCustomCommandHandler(handler);
   }
 
   handleUserInput(input: Record<UserId, UserAction[]>): void {
@@ -107,7 +107,7 @@ export class SimpleECR extends ECRApi {
       }
     }
 
-    this.simulation.injectCommands([new AddInputCommand(processedInput)]);
+    this.ecr.injectCommands([new AddInputCommand(processedInput)]);
   }
 
   protected actionResourceName(action: UserAction | string): string {
