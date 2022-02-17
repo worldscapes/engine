@@ -1,4 +1,4 @@
-import { WorldStateSnapshot } from "../../ecr/simulation/implementations/simple.simulation";
+import { WorldStateSnapshot } from "../../ecr/ecr/implementations/simple.ecr";
 import { UserAction } from "../../display/display.api";
 import { UserId } from "../adapter/adapter.api";
 

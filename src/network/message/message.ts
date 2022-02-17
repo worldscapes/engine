@@ -25,7 +25,9 @@ export class NetworkMessageMapper {
     handler: NetworkMessageHandler<T>
   ): Unsubscriber {
     this.handlers[messageType.name] = this.handlers[messageType.name] ?? [];
-    this.handlers[messageType.name].push(handler as NetworkMessageHandler<NetworkMessage>);
+    this.handlers[messageType.name].push(
+      handler as NetworkMessageHandler<NetworkMessage>
+    );
 
     return () => {
       this.handlers[messageType.name] = this.handlers[messageType.name].filter(

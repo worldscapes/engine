@@ -11,12 +11,13 @@ import {
   getTypeName,
   ResourcePurposes,
   ResourceRequest,
-  SimpleECR,
+  SimpleClientSimulation,
+  SimpleEcr,
   SimpleEngineClient,
   SimpleEngineServer,
   SimpleNetworkClient,
   SimpleNetworkServer,
-  SimpleSimulation,
+  SimpleServerSimulation,
   UpdateComponentCommand,
   UserAction,
   UserActionResource,
@@ -41,11 +42,11 @@ const query = {
   },
   resource: {
     addOneActions: new ResourceRequest<
-        UserActionResource<AddOneCardAction>,
-        typeof ResourcePurposes.CHECK
-        >(ResourcePurposes.CHECK, "test"),
+      UserActionResource<AddOneCardAction>,
+      typeof ResourcePurposes.CHECK
+    >(ResourcePurposes.CHECK, "test"),
   },
-}
+};
 
 const testCards = [
   {
@@ -166,16 +167,21 @@ const clearActionsRule = ECRRule.create({
 const testRule = ECRRule.create({
   query: {
     entity: {
-      test: new EntityRequest({ someComponent: new ComponentSelector(ComponentPurposes.WRITE, CardShuffle) })
+      test: new EntityRequest({
+        someComponent: new ComponentSelector(
+          ComponentPurposes.WRITE,
+          CardShuffle
+        ),
+      }),
     },
-    resource: {}
+    resource: {},
   },
   condition: () => true,
   body: () => {},
 });
 
-console.log('Creating simulation instance.');
-const simulation = new SimpleSimulation()
+console.log("Creating simulation instance.");
+const ecr = new SimpleEcr()
   .addRule(shuffleCardCollectionRule)
   .addRule(createCardCollectionRule)
   .addRule(addOneCardOnInputRule)
@@ -185,42 +191,39 @@ const simulation = new SimpleSimulation()
 // const serverAdapter = new LocalServerNetworkAdapter();
 // const clientAdapter = new LocalClientNetworkAdapter(serverAdapter);
 
-
-console.log('Creating adapters.');
+console.log("Creating adapters.");
 const serverAdapter = new WebsocketServerNetworkAdapter();
 const clientAdapter = new WebsocketClientNetworkAdapter("localhost");
 
-
-console.log('Creating mock display.');
+console.log("Creating mock display.");
 const display: DisplayApi = {
   takeUpdatedSnapshot(snapshot: WorldStateSnapshot) {
-    console.log(snapshot);
-  }
+    console.log(JSON.stringify(snapshot, null, 2));
+  },
 };
 
 async function init() {
-
-  console.log('Waiting for network adapter connection.');
+  console.log("Waiting for network adapter connection.");
   await serverAdapter.isReady();
   await clientAdapter.isReady();
 
   // serverAdapter.sendMessageByRank('client', JSON.stringify({someTestMessage: 1}));
   // clientAdapter.sendMessageByRank('server', JSON.stringify({someTestMessage: 1}));
 
-  console.log('Starting Server.');
+  console.log("Starting Server.");
   new SimpleEngineServer(
-    new SimpleECR(simulation),
+    new SimpleServerSimulation(ecr),
     new SimpleNetworkServer(serverAdapter)
   ).start();
 
-  console.log('Starting Client.');
+  console.log("Starting Client.");
   new SimpleEngineClient(
-    new SimpleSimulation(),
+    new SimpleClientSimulation(new SimpleEcr()),
     new SimpleNetworkClient(clientAdapter),
     display
   ).start();
 
-  console.log('Successfully initialized.');
+  console.log("Successfully initialized.");
 
   // Mock Input
   setInterval(() => {

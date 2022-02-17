@@ -12,7 +12,7 @@ import {
   StoreComponentPurposes,
 } from "../request/request";
 import { isTypeOf } from "../../../typing/WSCStructure";
-import { WorldStateSnapshot } from "../../simulation/implementations/simple.simulation";
+import { WorldStateSnapshot } from "../../ecr/implementations/simple.ecr";
 
 export class ECREntity {
   constructor(readonly id: number) {}
@@ -50,8 +50,7 @@ export class SimpleStore extends ECRStore {
 
         while (i < selectorKeyArray.length) {
           const key = selectorKeyArray[i];
-          const selector: StoreComponentSelector =
-            request.selectors[key];
+          const selector: StoreComponentSelector = request.selectors[key];
 
           const foundComponent = components.find((component) =>
             isTypeOf(component, selector.componentType)

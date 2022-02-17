@@ -1,4 +1,4 @@
-import { WorldStateSnapshot } from "../ecr/simulation/implementations/simple.simulation";
+import { WorldStateSnapshot } from "../ecr/ecr/implementations/simple.ecr";
 import { WSCStructure } from "../typing/WSCStructure";
 
 export abstract class UserAction extends WSCStructure {}

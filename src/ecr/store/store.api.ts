@@ -1,7 +1,7 @@
+import { WorldStateSnapshot } from "../ecr/implementations/simple.ecr";
 import { ECRComponent } from "../state/component/component";
 import { ECRResource } from "../state/resource/resource";
 import { StoreQuerySubscription, StoreQuery } from "./request/request";
-import { WorldStateSnapshot } from "../simulation/implementations/simple.simulation";
 
 export abstract class ECRStore {
   abstract subscribeQuery<T extends StoreQuery>(

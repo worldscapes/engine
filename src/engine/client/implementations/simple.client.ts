@@ -1,12 +1,12 @@
 import { WorldscapesClientApi } from "../worldscapes-client.api";
 import { NetworkClientApi } from "../../../network/client/client-network.api";
-import { ECRSimulationApi } from "../../../ecr/simulation/simulation.api";
 import { setInterval } from "timers";
 import { DisplayApi, UserAction } from "../../../display/display.api";
+import { ClientSimulationApi } from "../simulation/client-simulation.api";
 
 export class SimpleEngineClient extends WorldscapesClientApi {
   constructor(
-    protected simulation: ECRSimulationApi,
+    protected simulation: ClientSimulationApi,
     protected network: NetworkClientApi,
     protected display: DisplayApi
   ) {
@@ -29,7 +29,7 @@ export class SimpleEngineClient extends WorldscapesClientApi {
       // Apply changes from server
       const snapshot = this.network.getLastReceivedSnapshot();
       if (snapshot) {
-        this.simulation.loadSnapshot(snapshot);
+        this.simulation.applyServerUpdate(snapshot);
       }
 
       // Run simulation
