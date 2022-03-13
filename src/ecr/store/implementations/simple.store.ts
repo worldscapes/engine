@@ -11,7 +11,7 @@ import {
   StoreReturnComponentPurpose,
   StoreComponentPurposes,
 } from "../request/request";
-import { isTypeOf } from "../../../typing/WSCStructure";
+import {getObjectType, isSameType, isTypeOf} from "../../../typing/WSCStructure";
 import { WorldStateSnapshot } from "../../ecr/implementations/simple.ecr";
 
 export class ECREntity {
@@ -135,11 +135,16 @@ export class SimpleStore extends ECRStore {
     oldComponent: T,
     newComponent: T
   ): void {
+    let updated = false;
     this.components[entityId].forEach((el, index) => {
       if (el === oldComponent) {
         this.components[entityId][index] = newComponent;
+        updated = true;
       }
     });
+    if (!updated) {
+      throw new Error("Trying to update non-existing component");
+    }
   }
 
   deleteComponent<T extends ECRComponent>(
@@ -147,16 +152,15 @@ export class SimpleStore extends ECRStore {
     component: T
   ): void {
     this.components[entityId] = this.components[entityId].filter((el) => {
-      if (el !== component) {
-        return el;
-      }
+      return el !== component;
     });
   }
 
   addResource<T extends ECRResource>(resourceName: string, resource: T): void {
-    if (!this.resources[resourceName]) {
-      this.resources[resourceName] = resource;
+    if (this.resources[resourceName]) {
+      throw new Error(`Tried to use resource tag [${resourceName}] which is already taken`);
     }
+    this.resources[resourceName] = resource;
   }
 
   // Can change a type of resource
@@ -164,6 +168,10 @@ export class SimpleStore extends ECRStore {
     resourceName: string,
     resource: T
   ): void {
+    const currentResource = this.resources[resourceName];
+    if (currentResource && !isSameType(currentResource, resource)) {
+      throw Error(`Tried to change resource with [${resourceName}] from type [${getObjectType(this.resources[resourceName])}] to type [${getObjectType(resource)}]`);
+    }
     this.resources[resourceName] = resource;
   }
 

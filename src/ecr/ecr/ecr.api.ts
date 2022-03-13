@@ -10,8 +10,6 @@ export interface ECRTickResult {
 }
 
 export abstract class ECRApi {
-  public abstract loadSnapshot(snapshot: WorldStateSnapshot): void;
-
   public abstract runSimulationTick(): ECRTickResult;
 
   public abstract addRule<T extends ECRQuery>(rule: ECRRule<T>): void;

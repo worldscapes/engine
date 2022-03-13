@@ -5,3 +5,4 @@ node_modules
 /docs/typedoc/
 /dist/
 /testing/dist/
+/coverage/

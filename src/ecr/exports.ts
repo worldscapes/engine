@@ -10,6 +10,7 @@ export * from "./command/built-in/delete-entity.command";
 export * from "./command/built-in/delete-resource.command";
 export * from "./command/built-in/update-component.command";
 export * from "./command/built-in/update-resource.command";
+export * from "./command/built-in/load-snapshot.command";
 
 export * from "./rule/rule";
 

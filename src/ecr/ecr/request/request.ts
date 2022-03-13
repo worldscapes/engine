@@ -2,6 +2,7 @@ import { WSCStructure } from "../../../typing/WSCStructure";
 import { Constructor } from "../../../utility/types/constructor";
 import { ECRComponent } from "../../state/component/component";
 import { ECRResource } from "../../state/resource/resource";
+import {IPurpose} from "./IPurpose";
 
 export type ECRQuery<
   E extends { [key: string]: EntityRequest } = Record<string, never>,
@@ -46,10 +47,6 @@ export type ECRQueryResult<
 };
 
 export abstract class RuleRequest extends WSCStructure {}
-
-export abstract class IPurpose {
-  readonly purposeKey;
-}
 
 export class IComponentPurpose extends IPurpose {}
 export class CheckComponentPurpose extends IComponentPurpose {
