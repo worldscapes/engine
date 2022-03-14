@@ -2,7 +2,7 @@
   "name": "@worldscapes/engine",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Data-driven framework for game development",
   "homepage": "https://github.com/SFilinsky/worldscapes-engine/wiki/About-Engine",
   "keywords": [
