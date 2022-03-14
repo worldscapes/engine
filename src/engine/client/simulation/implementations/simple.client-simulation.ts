@@ -1,6 +1,7 @@
 import { ClientSimulationApi } from "../client-simulation.api";
 import { ECRApi, ECRTickResult } from "../../../../ecr/ecr/ecr.api";
 import { WorldStateSnapshot } from "../../../../ecr/ecr/implementations/simple.ecr";
+import {LoadSnapshotCommand} from "../../../../ecr/command/built-in/load-snapshot.command";
 
 export class SimpleClientSimulation extends ClientSimulationApi {
   constructor(protected ecr: ECRApi) {
@@ -12,6 +13,6 @@ export class SimpleClientSimulation extends ClientSimulationApi {
   }
 
   public applyServerUpdate(snapshot: WorldStateSnapshot): void {
-    this.ecr.loadSnapshot(snapshot);
+    this.ecr.injectCommands([ new LoadSnapshotCommand(snapshot) ])
   }
 }

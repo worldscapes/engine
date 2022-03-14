@@ -1,5 +1,9 @@
 import { Constructor } from "../utility/types/constructor";
 
+export abstract class WSCStructure {
+  readonly typeChain: string[] = getChainNames(this);
+}
+
 function getChainNames(obj: WSCStructure) {
   const chainNames: string[] = [];
 
@@ -12,9 +16,6 @@ function getChainNames(obj: WSCStructure) {
   return chainNames;
 }
 
-export abstract class WSCStructure {
-  readonly typeChain: string[] = getChainNames(this);
-}
 
 export function getTypeName<T extends WSCStructure>(
   constructor: Constructor<T>
@@ -31,4 +32,8 @@ export function isTypeOf<T extends WSCStructure>(
   type: Constructor<T>
 ): boolean {
   return object.typeChain.includes(type.prototype.constructor.name);
+}
+
+export function isSameType<T extends WSCStructure, R extends WSCStructure>(obj1: T, obj2: R): boolean {
+  return getObjectType(obj1) === getObjectType(obj2);
 }

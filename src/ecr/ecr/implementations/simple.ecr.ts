@@ -48,6 +48,7 @@ import { ECRComponent } from "../../state/component/component";
 import { ECRResource } from "../../state/resource/resource";
 import { getObjectType } from "../../../typing/WSCStructure";
 import { ECRApi, ECRTickResult } from "../ecr.api";
+import {loadSnapshotHandler} from "../../command/built-in/load-snapshot.command";
 
 export interface WorldStateSnapshot {
   entities: ECREntity[];
@@ -55,6 +56,14 @@ export interface WorldStateSnapshot {
   resources: Record<string, ECRResource>;
 }
 
+
+/**
+ * Responsibilities:
+ * 1. Command handler management
+ * 2. Rule management
+ * 3. Simulation management
+ * 4. Query fulfillment
+ */
 export class SimpleEcr extends ECRApi {
   protected builtInCommandHandlers: ECRCommandHandler[] = [
     createEntityHandler,
@@ -67,6 +76,8 @@ export class SimpleEcr extends ECRApi {
     addResourceHandler,
     updateResourceHandler,
     deleteResourceHandler,
+
+    loadSnapshotHandler,
   ];
 
   protected rules: ECRRule[] = [];
@@ -82,12 +93,7 @@ export class SimpleEcr extends ECRApi {
     super();
   }
 
-  readonly loadSnapshot = this.store.loadSnapshot.bind(this.store);
-
   public runSimulationTick(): ECRTickResult {
-    const handlerTypes = this.commandHandlers.map(
-      (handler) => handler.commandType
-    );
     const allCommands: ECRCommand[] = [];
 
     // Handle injected commands
@@ -97,10 +103,11 @@ export class SimpleEcr extends ECRApi {
     // Handle rules
     this.rules.forEach((rule) => {
       // Get query data
-      const data = this.querySubMap.get(rule)?.getCurrentData();
-      if (!data) {
+      const querySub = this.querySubMap.get(rule);
+      if (!querySub) {
         return;
       }
+      const data = querySub.getCurrentData();
 
       // Condition - Check, Read, Write
       const dataForCondition = this.filterResult(
