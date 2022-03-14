@@ -30,8 +30,6 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
       - name: Installing node_modules
         run: npm install
-      - name: Updating version
-        run: npm version patch -m "$GITHUB_REF_NAME"
       - name: Publishing
         run: npm publish --access public
         env:
