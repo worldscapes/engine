@@ -87,7 +87,7 @@ export namespace ECRApiTools {
                         },
                         commands: [],
                     });
-                })
+                });
 
             });
 
@@ -234,7 +234,7 @@ export namespace ECRApiTools {
 
                 test("Should call custom command handlers", () => {
                    const handlerEffect = jest.fn((command, store) => {});
-                   const handler = createCommandHandler(CreateEntityWithComponentsCommand, handlerEffect)
+                   const handler = createCommandHandler(CreateEntityWithComponentsCommand, handlerEffect);
                    ecr.addCustomCommandHandler(handler);
                    const command = new CreateEntityWithComponentsCommand([]);
                    ecr.injectCommands([ command ]);
@@ -254,7 +254,7 @@ export namespace ECRApiTools {
                         removePrototype(new TestComponent(2)),
                         removePrototype(new TestComponent(3)),
                         removePrototype(new TestComponent(4)),
-                    ]
+                    ];
                     ecr.injectCommands([ new CreateEntityWithComponentsCommand(components) ]);
                     const snapshot = ecr.runSimulationTick().snapshot;
                     expect(snapshot.entities).toHaveLength(1);
@@ -320,10 +320,10 @@ export namespace ECRApiTools {
                             'testResource1': removePrototype(new TestResource(1)),
                             'testResource2': removePrototype(new TestResource2(2)),
                         }
-                    }
+                    };
 
                     ecr.injectCommands([ new LoadSnapshotCommand(testSnapshot) ]);
-                })
+                });
 
                 test("Should check custom rule condition", () => {
                     const condition = jest.fn(() => true);
@@ -332,10 +332,10 @@ export namespace ECRApiTools {
                         query: emptyQuery,
                         condition,
                         body
-                    })
+                    });
                     ecr.runSimulationTick();
                     expect(condition).toBeCalledTimes(1);
-                })
+                });
 
                 test("Should call custom rule body when condition returns true", () => {
                     const condition = jest.fn(() => true);
@@ -344,7 +344,7 @@ export namespace ECRApiTools {
                         query: emptyQuery,
                         condition,
                         body
-                    })
+                    });
                     ecr.runSimulationTick();
                     expect(body).toBeCalledTimes(1);
                 });
@@ -355,7 +355,7 @@ export namespace ECRApiTools {
                         condition: jest.fn(() => false),
                         body: jest.fn(() => {})
                     });
-                    ecr.addRule(rule)
+                    ecr.addRule(rule);
                     ecr.runSimulationTick();
                     expect(rule.body).not.toBeCalled();
                 });
@@ -445,7 +445,7 @@ export namespace ECRApiTools {
 
             });
 
-        })
+        });
 
     }
 }

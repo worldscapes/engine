@@ -13,6 +13,6 @@ export class SimpleClientSimulation extends ClientSimulationApi {
   }
 
   public applyServerUpdate(snapshot: WorldStateSnapshot): void {
-    this.ecr.injectCommands([ new LoadSnapshotCommand(snapshot) ])
+    this.ecr.injectCommands([ new LoadSnapshotCommand(snapshot) ]);
   }
 }

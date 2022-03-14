@@ -24,7 +24,7 @@ describe("Typing tools", () => {
             expect(getTypeName(SomeClass)).toBe("SomeClass");
         });
 
-    })
+    });
 
 
     describe("getObjectType", () => {
@@ -34,33 +34,33 @@ describe("Typing tools", () => {
             expect(getObjectType(obj)).toBe("SomeClass");
         });
 
-    })
+    });
 
     describe("isTypeOf", () => {
 
         test("Should return true when the given type is in object's typeChain", () => {
             const obj = removePrototype(new SomeClass2());
             expect(isTypeOf(obj, SomeClass)).toBeTruthy();
-        })
+        });
 
         test("Should return false when the given type is not in object's typeChain", () => {
             const obj = removePrototype(new SomeClass3());
             expect(isTypeOf(obj, SomeClass2)).toBeFalsy();
-        })
+        });
 
-    })
+    });
 
     describe("isSameType", () => {
         test("Should return true when objects are of same type", () => {
             const obj = removePrototype(new SomeClass2());
             const obj2 = removePrototype(new SomeClass2());
             expect(isSameType(obj, obj2)).toBeTruthy();
-        })
+        });
 
         test("Should return false when objects are of different type", () => {
             const obj = removePrototype(new SomeClass());
             const obj2 = removePrototype(new SomeClass2());
             expect(isSameType(obj, obj2)).toBeFalsy();
-        })
-    })
+        });
+    });
 });
