@@ -16,11 +16,13 @@ export * from "./rule/rule";
 
 export * from "./ecr/request/request";
 export * from "./ecr/ecr.api";
+export * from "./ecr/ecr.api.tools";
 export * from "./ecr/implementations/simple.ecr";
 
 export * from "./state/resource/resource";
 export * from "./state/component/component";
 
 export * from "./store/store.api";
+export * from "./store/store.api.tools";
 export * from "./store/implementations/simple.store";
 export * from "./store/request/request";

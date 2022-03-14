@@ -233,7 +233,7 @@ export namespace ECRApiTools {
                 }
 
                 test("Should call custom command handlers", () => {
-                   const handlerEffect = jest.fn(() => {});
+                   const handlerEffect = jest.fn((command, store) => {});
                    const handler = createCommandHandler(CreateEntityWithComponentsCommand, handlerEffect)
                    ecr.addCustomCommandHandler(handler);
                    const command = new CreateEntityWithComponentsCommand([]);
