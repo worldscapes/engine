@@ -2,7 +2,7 @@
   "name": "@worldscapes/server",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Worldscapes - server engine part",
   "homepage": "https://github.com/SFilinsky/worldscapes-engine/wiki/About-Engine",
   "keywords": [
@@ -36,7 +36,7 @@
     }
   },
   "dependencies": {
-    "@worldscapes/common": "^0.0.3",
+    "@worldscapes/common": "^0.0.4",
     "ws": "^8.4.0"
   },
   "devDependencies": {
