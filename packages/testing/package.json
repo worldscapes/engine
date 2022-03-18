@@ -1,6 +1,6 @@
 {
   "name": "@worldscapes/testing",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "private": true,
   "scripts": {
     "build": "tsc",
@@ -11,8 +11,8 @@
     "lint": "eslint ./src --ext .ts --f table"
   },
   "dependencies": {
+    "@worldscapes/client": "^0.0.3",
     "@worldscapes/common": "^0.0.2",
-    "@worldscapes/client": "^0.0.2",
-    "@worldscapes/server": "^0.0.2"
+    "@worldscapes/server": "^0.0.3"
   }
 }

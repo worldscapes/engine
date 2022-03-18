@@ -1,4 +1,4 @@
-import {UserAction, WorldStateSnapshot } from "../../../common";
+import { UserAction, WorldStateSnapshot } from "../../../common";
 
 export abstract class NetworkClientApi {
   abstract getLastReceivedSnapshot(): WorldStateSnapshot;

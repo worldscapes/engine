@@ -1,16 +1,17 @@
 import {
-    createCommandHandler,
-    ECRApi,
-    ECRCommand,
-    ECRCommandHandler,
-    ECRResource, ECRTickResult,
-    StoreResourceRequest,
-    UpdateResourceCommand,
-    UserAction,
-    UserId,
-    getObjectType
+  createCommandHandler,
+  ECRApi,
+  ECRCommand,
+  ECRCommandHandler,
+  ECRResource,
+  ECRTickResult,
+  StoreResourceRequest,
+  UpdateResourceCommand,
+  UserAction,
+  UserId,
+  getObjectType,
 } from "@worldscapes/common";
-import {ServerSimulationApi} from "../server-simulation.api";
+import { ServerSimulationApi } from "../server-simulation.api";
 
 class AddInputCommand extends ECRCommand {
   constructor(
@@ -21,13 +22,12 @@ class AddInputCommand extends ECRCommand {
 }
 
 export class UserActionResource<
-    T extends UserAction = UserAction
-    > extends ECRResource {
-    constructor(readonly actions: Record<UserId, UserAction[]>) {
-        super();
-    }
+  T extends UserAction = UserAction
+> extends ECRResource {
+  constructor(readonly actions: Record<UserId, UserAction[]>) {
+    super();
+  }
 }
-
 
 export class SimpleServerSimulation extends ServerSimulationApi {
   constructor(protected ecr: ECRApi) {

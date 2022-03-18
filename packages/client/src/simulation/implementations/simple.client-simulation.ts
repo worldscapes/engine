@@ -1,4 +1,9 @@
-import { ECRApi, ECRTickResult, LoadSnapshotCommand, WorldStateSnapshot } from "../../../../common";
+import {
+  ECRApi,
+  ECRTickResult,
+  LoadSnapshotCommand,
+  WorldStateSnapshot,
+} from "../../../../common";
 import { ClientSimulationApi } from "../client-simulation.api";
 
 export class SimpleClientSimulation extends ClientSimulationApi {
@@ -11,6 +16,6 @@ export class SimpleClientSimulation extends ClientSimulationApi {
   }
 
   public applyServerUpdate(snapshot: WorldStateSnapshot): void {
-    this.ecr.injectCommands([ new LoadSnapshotCommand(snapshot) ]);
+    this.ecr.injectCommands([new LoadSnapshotCommand(snapshot)]);
   }
 }

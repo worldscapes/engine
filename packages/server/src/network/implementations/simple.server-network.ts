@@ -4,10 +4,10 @@ import {
   UpdatedSnapshotMessage,
   UserAction,
   WorldStateSnapshot,
-  UserId
+  UserId,
 } from "../../../../common";
 import { NetworkServerApi } from "../server-network.api";
-import {UserInputMessage} from "../../../../client";
+import { UserInputMessage } from "../../../../client";
 
 export class SimpleNetworkServer extends NetworkServerApi {
   protected accumulatedUserInput: Record<UserId, UserAction[]> = {};
@@ -44,4 +44,3 @@ export class SimpleNetworkServer extends NetworkServerApi {
     return input;
   }
 }
-

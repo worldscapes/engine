@@ -1,4 +1,11 @@
-import {NetworkAdapterApi, NetworkMessage, NetworkMessageMapper, UserAction, WorldStateSnapshot, UpdatedSnapshotMessage} from "../../../../common";
+import {
+  NetworkAdapterApi,
+  NetworkMessage,
+  NetworkMessageMapper,
+  UserAction,
+  WorldStateSnapshot,
+  UpdatedSnapshotMessage,
+} from "../../../../common";
 import { NetworkClientApi } from "../client-network.api";
 
 export class UserInputMessage extends NetworkMessage {
