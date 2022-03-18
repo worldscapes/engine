@@ -16,7 +16,6 @@ function getChainNames(obj: WSCStructure) {
   return chainNames;
 }
 
-
 export function getTypeName<T extends WSCStructure>(
   constructor: Constructor<T>
 ): string {
@@ -34,6 +33,9 @@ export function isTypeOf<T extends WSCStructure>(
   return object.typeChain.includes(type.prototype.constructor.name);
 }
 
-export function isSameType<T extends WSCStructure, R extends WSCStructure>(obj1: T, obj2: R): boolean {
+export function isSameType<T extends WSCStructure, R extends WSCStructure>(
+  obj1: T,
+  obj2: R
+): boolean {
   return getObjectType(obj1) === getObjectType(obj2);
 }

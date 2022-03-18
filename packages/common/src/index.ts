@@ -33,7 +33,7 @@ export * from "./network/message/built-in/updated-snapshot.message";
 export * from "./network/user-action/user-action";
 
 // Typing
-export * from './typing/WSCStructure';
+export * from "./typing/WSCStructure";
 
 // Utility
 export * from "./utility/classes/resolver";

@@ -48,14 +48,13 @@ import { ECRComponent } from "../../state/component/component";
 import { ECRResource } from "../../state/resource/resource";
 import { getObjectType } from "../../../typing/WSCStructure";
 import { ECRApi, ECRTickResult } from "../ecr.api";
-import {loadSnapshotHandler} from "../../command/built-in/load-snapshot.command";
+import { loadSnapshotHandler } from "../../command/built-in/load-snapshot.command";
 
 export interface WorldStateSnapshot {
   entities: ECREntity[];
   components: Record<number, ECRComponent[]>;
   resources: Record<string, ECRResource>;
 }
-
 
 /**
  * Responsibilities:

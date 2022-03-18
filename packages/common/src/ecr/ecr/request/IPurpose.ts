@@ -1,3 +1,3 @@
 export abstract class IPurpose {
-    readonly purposeKey;
+  readonly purposeKey;
 }

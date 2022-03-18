@@ -1,3 +1,3 @@
-import {WSCStructure} from "../../typing/WSCStructure";
+import { WSCStructure } from "../../typing/WSCStructure";
 
 export abstract class UserAction extends WSCStructure {}

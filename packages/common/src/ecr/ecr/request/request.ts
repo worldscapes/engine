@@ -2,7 +2,7 @@ import { WSCStructure } from "../../../typing/WSCStructure";
 import { Constructor } from "../../../utility/types/constructor";
 import { ECRComponent } from "../../state/component/component";
 import { ECRResource } from "../../state/resource/resource";
-import {IPurpose} from "./IPurpose";
+import { IPurpose } from "./IPurpose";
 
 export type ECRQuery<
   E extends { [key: string]: EntityRequest } = Record<string, never>,

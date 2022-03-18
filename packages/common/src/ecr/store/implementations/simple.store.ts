@@ -11,7 +11,11 @@ import {
   StoreReturnComponentPurpose,
   StoreComponentPurposes,
 } from "../request/request";
-import {getObjectType, isSameType, isTypeOf} from "../../../typing/WSCStructure";
+import {
+  getObjectType,
+  isSameType,
+  isTypeOf,
+} from "../../../typing/WSCStructure";
 import { WorldStateSnapshot } from "../../ecr/implementations/simple.ecr";
 
 export class ECREntity {
@@ -158,7 +162,9 @@ export class SimpleStore extends ECRStore {
 
   addResource<T extends ECRResource>(resourceName: string, resource: T): void {
     if (this.resources[resourceName]) {
-      throw new Error(`Tried to use resource tag [${resourceName}] which is already taken`);
+      throw new Error(
+        `Tried to use resource tag [${resourceName}] which is already taken`
+      );
     }
     this.resources[resourceName] = resource;
   }
@@ -170,7 +176,11 @@ export class SimpleStore extends ECRStore {
   ): void {
     const currentResource = this.resources[resourceName];
     if (currentResource && !isSameType(currentResource, resource)) {
-      throw Error(`Tried to change resource with [${resourceName}] from type [${getObjectType(this.resources[resourceName])}] to type [${getObjectType(resource)}]`);
+      throw Error(
+        `Tried to change resource with [${resourceName}] from type [${getObjectType(
+          this.resources[resourceName]
+        )}] to type [${getObjectType(resource)}]`
+      );
     }
     this.resources[resourceName] = resource;
   }

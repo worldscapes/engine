@@ -9,6 +9,6 @@
  * @param obj
  */
 export function removePrototype<T>(obj: T): T {
-    Object.setPrototypeOf(obj, Object.prototype);
-    return obj;
+  Object.setPrototypeOf(obj, Object.prototype);
+  return obj;
 }
