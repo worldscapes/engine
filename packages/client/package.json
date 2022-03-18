@@ -36,6 +36,6 @@
     }
   },
   "dependencies": {
-    "@worldscapes/common": "^0.0.2"
+    "@worldscapes/common": "^0.0.3"
   }
 }
