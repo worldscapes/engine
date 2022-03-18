@@ -1,3 +1,5 @@
+import {SimpleClientSimulation, SimpleEngineClient } from "@worldscapes/client";
+import { SimpleEcr } from "@worldscapes/common";
 import {
   CheckComponentPurpose,
   ComponentPurposes,
@@ -11,13 +13,9 @@ import {
   getTypeName,
   ResourcePurposes,
   ResourceRequest,
-  SimpleClientSimulation,
-  SimpleEcr,
-  SimpleEngineClient,
   SimpleEngineServer,
   SimpleNetworkClient,
   SimpleNetworkServer,
-  SimpleServerSimulation,
   UpdateComponentCommand,
   UserAction,
   UserActionResource,
@@ -25,6 +23,7 @@ import {
   WebsocketServerNetworkAdapter,
   WorldStateSnapshot,
 } from "@worldscapes/engine";
+import { SimpleServerSimulation } from "@worldscapes/server";
 
 class CardShuffle extends ECRComponent {
   constructor(readonly cards: typeof testCards[number][] = []) {
@@ -155,7 +154,7 @@ const clearActionsRule = ECRRule.create({
       >(ResourcePurposes.WRITE, "action_" + getTypeName(AddOneCardAction)),
     },
   },
-  condition: ({ entity: {}, resource: { addOneActions } }) =>
+  condition: ({ resource: { addOneActions } }) =>
     !!addOneActions && Object.keys(addOneActions.actions).length > 0,
   body: () => {
     return [

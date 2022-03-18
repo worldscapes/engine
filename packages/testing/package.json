@@ -7,9 +7,11 @@
     "build:clean": "npm run clear && tsc",
     "start": "nodemon --config ../../.nodemon/nodemon.json",
     "start:clean": "npm run clear && npm run start",
-    "clear": "del-cli --force ./dist"
+    "clear": "del-cli --force ./dist",
+    "lint": "eslint ./src --ext .ts --f table"
   },
   "dependencies": {
+    "@worldscapes/common": "^0.0.2",
     "@worldscapes/client": "^0.0.2",
     "@worldscapes/server": "^0.0.2"
   }

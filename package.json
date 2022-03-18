@@ -17,7 +17,8 @@
   "scripts": {
     "bootstrap": "lerna bootstrap --hoist --strict",
     "start:all": "",
-    "start:all:clean": ""
+    "start:all:clean": "",
+    "lint": "lerna run lint --stream"
   },
   "devDependencies": {
     "@types/node": "^15.12.2",
