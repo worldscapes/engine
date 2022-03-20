@@ -1,6 +1,0 @@
-{
-  "ignore": [],
-  "watch": ["./src", "../dist"],
-  "exec": "npm run build",
-  "ext": "ts"
-}
