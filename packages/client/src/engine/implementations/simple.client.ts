@@ -4,13 +4,27 @@ import { ClientSimulationApi } from "../../simulation/client-simulation.api";
 import { UserAction } from "../../../../common";
 import { NetworkClientApi } from "../../network/client-network.api";
 
+export interface SimpleEngineClientOptions {
+  inputBatchingInterval: number
+}
+
 export class SimpleEngineClient extends WorldscapesClientApi {
+
+  protected defaultOptions: SimpleEngineClientOptions = { inputBatchingInterval: 16 };
+  protected options: SimpleEngineClientOptions;
+
   constructor(
     protected simulation: ClientSimulationApi,
     protected network: NetworkClientApi,
-    protected display: DisplayApi
+    protected display: DisplayApi,
+    options?: Partial<SimpleEngineClientOptions>
   ) {
     super();
+
+    this.options = {
+      ...this.defaultOptions,
+      ...(options ?? {})
+    };
   }
 
   public start(): void {
@@ -36,6 +50,6 @@ export class SimpleEngineClient extends WorldscapesClientApi {
       const simulationResult = this.simulation.runSimulationTick();
 
       this.display.takeUpdatedSnapshot?.(simulationResult.snapshot);
-    }, 1000);
+    }, this.options.inputBatchingInterval);
   }
 }

@@ -24,10 +24,6 @@ export * from "./ecr/store/request/request";
 
 // Network
 export * from "./network/adapter/adapter.api";
-export * from "./network/adapter/implementations/local/local-client.adapter";
-export * from "./network/adapter/implementations/local/local-server.adapter";
-export * from "./network/adapter/implementations/websocket/websocket-client.adapter";
-export * from "./network/adapter/implementations/websocket/websocket-server.adapter";
 export * from "./network/message/message";
 export * from "./network/message/built-in/updated-snapshot.message";
 export * from "./network/user-action/user-action";

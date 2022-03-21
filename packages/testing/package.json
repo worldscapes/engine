@@ -1,18 +1,26 @@
 {
   "name": "@worldscapes/testing",
-  "version": "0.0.4",
+  "version": "0.0.2",
   "private": true,
+  "type": "commonjs",
   "scripts": {
     "build": "tsc",
     "build:clean": "npm run clear && tsc",
-    "start": "nodemon --config ../../.nodemon/nodemon.json",
+    "start": "nodemon --config ./.nodemon/nodemon.json",
     "start:clean": "npm run clear && npm run start",
     "clear": "del-cli --force ./dist",
-    "lint": "eslint ./src --ext .ts --f table"
+    "lint": "eslint ./src --ext .ts --f table",
+    "prepare": "npm run build"
   },
   "dependencies": {
     "@worldscapes/client": "^0.0.2",
     "@worldscapes/common": "^0.0.2",
     "@worldscapes/server": "^0.0.2"
-  }
+  },
+  "main": "index.js",
+  "devDependencies": {},
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
 }
