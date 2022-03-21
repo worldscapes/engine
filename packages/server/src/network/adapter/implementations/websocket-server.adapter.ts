@@ -1,4 +1,4 @@
-import { ConnectionInfo, NetworkAdapterApi } from "../../adapter.api";
+import {ConnectionInfo, NetworkAdapterApi } from "@worldscapes/common";
 import { WebSocket, WebSocketServer } from "ws";
 
 export class WebsocketServerNetworkAdapter extends NetworkAdapterApi {

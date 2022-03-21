@@ -1,5 +1,4 @@
-import { ConnectionInfo, NetworkAdapterApi } from "../../adapter.api";
-import { WebSocket } from "ws";
+import {ConnectionInfo, NetworkAdapterApi} from "@worldscapes/common";
 
 export class WebsocketClientNetworkAdapter extends NetworkAdapterApi {
   protected socket!: WebSocket;
@@ -8,12 +7,12 @@ export class WebsocketClientNetworkAdapter extends NetworkAdapterApi {
     super();
 
     this.socket = new WebSocket(`ws://${this.url}:${this.port}`);
-    this.socket.on("open", () => {
+    this.socket.addEventListener("open", () => {
       this.readyResolver.resolve();
     });
-    this.socket.on("message", (messageBinaryData) => {
+    this.socket.addEventListener("message", (messageEvent) => {
       this.onMessage({
-        messageText: messageBinaryData.toString(),
+        messageText: messageEvent.data,
         connectionInfo: this.getConnectionList()[0],
       });
     });

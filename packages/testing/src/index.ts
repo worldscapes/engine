@@ -1,29 +1,20 @@
-import {SimpleClientSimulation, SimpleEngineClient } from "@worldscapes/client";
-import { SimpleEcr } from "@worldscapes/common";
 import {
   CheckComponentPurpose,
   ComponentPurposes,
   ComponentSelector,
   CreateEntityCommand,
   DeleteResourceCommand,
-  DisplayApi,
   ECRComponent,
   ECRRule,
   EntityRequest,
   getTypeName,
   ResourcePurposes,
   ResourceRequest,
-  SimpleEngineServer,
-  SimpleNetworkClient,
-  SimpleNetworkServer,
+  SimpleEcr,
   UpdateComponentCommand,
   UserAction,
-  UserActionResource,
-  WebsocketClientNetworkAdapter,
-  WebsocketServerNetworkAdapter,
-  WorldStateSnapshot,
-} from "@worldscapes/engine";
-import { SimpleServerSimulation } from "@worldscapes/server";
+} from "@worldscapes/common";
+import {SimpleEngineServer, SimpleNetworkServer, SimpleServerSimulation, UserActionResource, WebsocketServerNetworkAdapter} from "@worldscapes/server";
 
 class CardShuffle extends ECRComponent {
   constructor(readonly cards: typeof testCards[number][] = []) {
@@ -180,31 +171,23 @@ const testRule = ECRRule.create({
 });
 
 console.log("Creating simulation instance.");
-const ecr = new SimpleEcr()
-  .addRule(shuffleCardCollectionRule)
-  .addRule(createCardCollectionRule)
-  .addRule(addOneCardOnInputRule)
-  .addRule(clearActionsRule)
-  .addRule(testRule);
+const ecr = new SimpleEcr();
+  // .addRule(shuffleCardCollectionRule)
+  // .addRule(createCardCollectionRule)
+  // .addRule(addOneCardOnInputRule)
+  // .addRule(clearActionsRule)
+  // .addRule(testRule);
 
 // const serverAdapter = new LocalServerNetworkAdapter();
-// const clientAdapter = new LocalClientNetworkAdapter(serverAdapter);
 
 console.log("Creating adapters.");
 const serverAdapter = new WebsocketServerNetworkAdapter();
-const clientAdapter = new WebsocketClientNetworkAdapter("localhost");
-
-console.log("Creating mock display.");
-const display: DisplayApi = {
-  takeUpdatedSnapshot(snapshot: WorldStateSnapshot) {
-    console.log(JSON.stringify(snapshot, null, 2));
-  },
-};
 
 async function init() {
   console.log("Waiting for network adapter connection.");
   await serverAdapter.isReady();
-  await clientAdapter.isReady();
+
+  serverAdapter.sendMessageToAll("{ 'test' : 123 }")
 
   // serverAdapter.sendMessageByRank('client', JSON.stringify({someTestMessage: 1}));
   // clientAdapter.sendMessageByRank('server', JSON.stringify({someTestMessage: 1}));
@@ -212,25 +195,10 @@ async function init() {
   console.log("Starting Server.");
   new SimpleEngineServer(
     new SimpleServerSimulation(ecr),
-    new SimpleNetworkServer(serverAdapter)
-  ).start();
-
-  console.log("Starting Client.");
-  new SimpleEngineClient(
-    new SimpleClientSimulation(new SimpleEcr()),
-    new SimpleNetworkClient(clientAdapter),
-    display
+    new SimpleNetworkServer(serverAdapter),
   ).start();
 
   console.log("Successfully initialized.");
-
-  // Mock Input
-  setInterval(() => {
-    const num = Math.random();
-    if (num > 0.5) {
-      display.onInput?.(new AddOneCardAction());
-    }
-  }, 2000);
 }
 
 init();
