@@ -1,4 +1,3 @@
-import { removePrototype } from "src/utility/functions/remove-prototype";
 import {
   getObjectType,
   getTypeName,
@@ -6,6 +5,7 @@ import {
   isTypeOf,
   WSCStructure,
 } from "./WSCStructure";
+import {removePrototype} from "../utility/functions/remove-prototype";
 
 describe("Typing tools", () => {
   class SomeClass extends WSCStructure {}

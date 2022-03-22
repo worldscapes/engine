@@ -154,29 +154,12 @@ const clearActionsRule = ECRRule.create({
   },
 });
 
-const testRule = ECRRule.create({
-  query: {
-    entity: {
-      test: new EntityRequest({
-        someComponent: new ComponentSelector(
-          ComponentPurposes.WRITE,
-          CardShuffle
-        ),
-      }),
-    },
-    resource: {},
-  },
-  condition: () => true,
-  body: () => {},
-});
-
 console.log("Creating simulation instance.");
-const ecr = new SimpleEcr();
-  // .addRule(shuffleCardCollectionRule)
-  // .addRule(createCardCollectionRule)
-  // .addRule(addOneCardOnInputRule)
-  // .addRule(clearActionsRule)
-  // .addRule(testRule);
+const ecr = new SimpleEcr()
+  .addRule(shuffleCardCollectionRule)
+  .addRule(createCardCollectionRule)
+  .addRule(addOneCardOnInputRule)
+  .addRule(clearActionsRule);
 
 // const serverAdapter = new LocalServerNetworkAdapter();
 
@@ -187,7 +170,7 @@ async function init() {
   console.log("Waiting for network adapter connection.");
   await serverAdapter.isReady();
 
-  serverAdapter.sendMessageToAll("{ 'test' : 123 }")
+  serverAdapter.sendMessageToAll("{ 'test' : 123 }");
 
   // serverAdapter.sendMessageByRank('client', JSON.stringify({someTestMessage: 1}));
   // clientAdapter.sendMessageByRank('server', JSON.stringify({someTestMessage: 1}));

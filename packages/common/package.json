@@ -21,18 +21,16 @@
     "build": "tsc",
     "start": "nodemon --config ../../.nodemon/nodemon.json",
     "start:clean": "npm run clear && npm run start",
-    "test": "jest",
-    "test:coverage": "jest --collectCoverage",
+
+    "test": "jest --passWithNoTests",
+    "test:coverage": "npm run test --collectCoverage",
+
     "lint": "eslint ./src --ext .ts --f table",
+
     "format": "prettier --write \"src/**/*.ts\"",
+
     "prepare": "npm run clear && npm run build",
     "prepublishOnly": "npm run lint",
-    "preversion": "npm run lint",
-    "version": "npm run format && git add -A src"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "npm run lint && npm run format"
-    }
+    "preversion": "npm run lint"
   }
 }

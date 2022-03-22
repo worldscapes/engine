@@ -7,9 +7,14 @@
     "start": "npx kill-port 4200 && ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
+
     "clean": "",
-    "prepare": "",
-    "lint": "ng lint"
+
+    "test": "echo TESTS PASSED",
+
+    "lint": "ng lint",
+
+    "prepare": ""
   },
   "dependencies": {
     "@angular/animations": "~13.2.0",

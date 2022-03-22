@@ -8,8 +8,13 @@
     "build:clean": "npm run clear && tsc",
     "start": "nodemon --config ./.nodemon/nodemon.json",
     "start:clean": "npm run clear && npm run start",
+
     "clear": "del-cli --force ./dist",
+
+    "test": "echo TESTS PASSED",
+
     "lint": "eslint ./src --ext .ts --f table",
+
     "prepare": "npm run build"
   },
   "dependencies": {

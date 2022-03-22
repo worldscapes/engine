@@ -2,6 +2,9 @@
   "ignorePatterns": [
     "projects/**/*"
   ],
+  "rules": {
+    "no-console": "off"
+  },
   "overrides": [
     {
       "files": [
