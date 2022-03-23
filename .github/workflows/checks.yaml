@@ -20,8 +20,14 @@ jobs:
         node-version: '16.x'
         registry-url: 'https://registry.npmjs.org'
 
-    - name: "Setup npm"
+    - name: "Bootstrap"
       run: |
         npm run bootstrap
+
+    - name: "Lint"
+      run: |
         npm run lint
+
+    - name: "Test"
+      run: |
         npm run test
