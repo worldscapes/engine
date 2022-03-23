@@ -34,7 +34,7 @@ jobs:
       run: |
         npm run test
 
-    - name: "Version and publish"
+    - name: "Version"
       env:
         GH_TOKEN: ${{ secrets.GITHUB_PAT }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_PAT }}
@@ -49,4 +49,10 @@ jobs:
           npx lerna version --conventional-commits --conventional-graduate --yes
         fi
 
+    - name: "Publish"
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_PAT }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_PAT }}
+        NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      run: |
         npx lerna publish from-git --yes
