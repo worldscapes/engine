@@ -17,20 +17,19 @@
   "scripts": {
     "bootstrap": "lerna bootstrap --hoist --strict",
     "clean:all": "lerna run --parallel clean",
-
     "start:all": "lerna run --parallel start",
     "start:all:clean": "npm run clean:all && npm run bootstrap && npm run start:all",
-
     "build:all": "lerna run --parallel build",
     "build:all:clean": "npm run clean:all && npm run bootstrap && npm run build:all",
-
     "test": "lerna run test --stream",
-
     "lint": "lerna run lint --stream",
-
     "prepare": "npm run clean:all && npm run build:all",
     "prepublishOnly": "npm run lint",
-    "preversion": "npm run lint"
+    "preversion": "npm run lint",
+    "versionup": "lerna version --conventional-commits",
+    "versionup:patch": "lerna version patch --conventional-commits",
+    "versionup:minor": "lerna version minor --conventional-commits",
+    "versionup:major": "lerna version major --conventional-commits"
   },
   "devDependencies": {
     "@types/jest": "^27.4.0",
@@ -52,7 +51,12 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "npm run lint && npm run format"
+      "pre-commit": "npm run lint && npm run format",
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
     }
+  },
+  "dependencies": {
+    "@commitlint/cli": "^16.2.3",
+    "@commitlint/config-conventional": "^16.2.1"
   }
 }
