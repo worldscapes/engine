@@ -15,6 +15,11 @@ jobs:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
 
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_PAT }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_PAT }}
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
     steps:
     - name: "Checkout"
       uses: actions/checkout@v2
@@ -35,15 +40,14 @@ jobs:
       run: |
         npm run test
 
-    - name: "Version"
-      env:
-        GH_TOKEN: ${{ secrets.GITHUB_PAT }}
-        GITHUB_TOKEN: ${{ secrets.GITHUB_PAT }}
-        NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+    - name: "Identity"
       run: |
         git config user.name "${{ github.actor }}"
-        git config user.email "${{ github.actor}}@users.noreply.github.com"
+        git config user.email "${{ github.actor }}@users.noreply.github.com"
+        git remote set-url origin https://x-access-token:${GH_TOKEN}@github.com/$GITHUB_REPOSITORY
 
+    - name: "Version"
+      run: |
         if [ ${{ github.base_ref }} = development ]; then
           npx lerna version --conventional-commits --conventional-prerelease --preid beta --yes
         else
@@ -51,9 +55,5 @@ jobs:
         fi
 
     - name: "Publish"
-      env:
-        GH_TOKEN: ${{ secrets.GITHUB_PAT }}
-        GITHUB_TOKEN: ${{ secrets.GITHUB_PAT }}
-        NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       run: |
         npx lerna publish from-git --yes
