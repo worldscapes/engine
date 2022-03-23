@@ -27,7 +27,9 @@
 
     "lint": "eslint ./src --ext .ts --f table",
 
-    "format": "prettier --write \"src/**/*.ts\""
+    "format": "prettier --write \"src/**/*.ts\"",
+
+    "prepare": "npm run clear && npm run build"
   },
   "dependencies": {
     "@worldscapes/common": "^0.0.2",

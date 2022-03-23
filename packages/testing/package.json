@@ -15,12 +15,12 @@
 
     "lint": "eslint ./src --ext .ts --f table",
 
-    "prepare": "npm run build"
+    "prepare": "npm run clear && npm run build"
   },
   "dependencies": {
-    "@worldscapes/client": "^0.0.2",
     "@worldscapes/common": "^0.0.2",
-    "@worldscapes/server": "^0.0.2"
+    "@worldscapes/server": "^0.0.2",
+    "@worldscapes/client": "^0.0.2"
   },
   "main": "index.js",
   "devDependencies": {},

@@ -16,7 +16,7 @@
   "license": "ISC",
   "scripts": {
     "bootstrap": "lerna bootstrap --hoist --strict",
-    "clean:all": "lerna run --parallel clean",
+    "clean:all": "lerna run --parallel clear",
     "start:all": "lerna run --parallel start",
     "start:all:clean": "npm run clean:all && npm run bootstrap && npm run start:all",
     "build:all": "lerna run --parallel build",
