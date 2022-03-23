@@ -2,7 +2,7 @@
   "name": "@worldscapes/server",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Worldscapes - server engine part",
   "homepage": "https://github.com/SFilinsky/worldscapes-engine/wiki/About-Engine",
   "keywords": [
@@ -21,18 +21,14 @@
     "build": "tsc",
     "start": "nodemon --config ../../.nodemon/nodemon.json",
     "start:clean": "npm run clear && npm run start",
-
     "test": "jest --passWithNoTests",
     "test:coverage": "npm run test --collectCoverage",
-
     "lint": "eslint ./src --ext .ts --f table",
-
     "format": "prettier --write \"src/**/*.ts\"",
-
     "prepare": "npm run clear && npm run build"
   },
   "dependencies": {
-    "@worldscapes/common": "^0.0.2",
+    "@worldscapes/common": "^0.0.3",
     "ws": "^8.4.0"
   },
   "devDependencies": {
