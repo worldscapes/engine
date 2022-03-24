@@ -1,8 +1,8 @@
 import { WorldscapesClientApi } from "../worldscapes-client.api";
 import { DisplayApi } from "../../display/display.api";
 import { ClientSimulationApi } from "../../simulation/client-simulation.api";
-import { UserAction } from "../../../../common";
 import { NetworkClientApi } from "../../network/client-network.api";
+import { UserAction } from "@worldscapes/common";
 
 export interface SimpleEngineClientOptions {
   inputBatchingInterval: number
