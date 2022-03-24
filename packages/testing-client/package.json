@@ -1,6 +1,6 @@
 {
   "name": "@worldscapes/testing-client",
-  "version": "0.1.0-beta.1",
+  "version": "0.1.0-beta.2",
   "private": true,
   "repository": {
     "type": "git",
@@ -26,8 +26,8 @@
     "@angular/platform-browser": "~13.2.0",
     "@angular/platform-browser-dynamic": "~13.2.0",
     "@angular/router": "~13.2.0",
-    "@worldscapes/client": "^0.1.0-beta.1",
-    "@worldscapes/common": "^0.1.0-beta.0",
+    "@worldscapes/client": "^0.1.0-beta.2",
+    "@worldscapes/common": "^0.1.0-beta.2",
     "rxjs": "~7.5.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.11.4"
