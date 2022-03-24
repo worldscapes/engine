@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.1.0-beta.1](https://github.com/worldscapes/engine/compare/v0.1.0-beta.0...v0.1.0-beta.1) (2022-03-24)
+
+
+### Bug Fixes
+
+* fixed imports in client package ([1c67b15](https://github.com/worldscapes/engine/commit/1c67b152c6c33adf964e4f353651fe081acc19ba))
+
+
+
+
+
 # 0.1.0-beta.0 (2022-03-24)
 
 

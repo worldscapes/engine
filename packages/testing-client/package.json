@@ -1,6 +1,6 @@
 {
   "name": "@worldscapes/testing-client",
-  "version": "0.1.0-beta.0",
+  "version": "0.1.0-beta.1",
   "private": true,
   "scripts": {
     "ng": "ng",
@@ -21,7 +21,7 @@
     "@angular/platform-browser": "~13.2.0",
     "@angular/platform-browser-dynamic": "~13.2.0",
     "@angular/router": "~13.2.0",
-    "@worldscapes/client": "^0.1.0-beta.0",
+    "@worldscapes/client": "^0.1.0-beta.1",
     "@worldscapes/common": "^0.1.0-beta.0",
     "rxjs": "~7.5.0",
     "tslib": "^2.3.0",
