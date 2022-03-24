@@ -2,7 +2,7 @@
   "name": "@worldscapes/server",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "version": "0.1.0-beta.0",
+  "version": "0.1.0-beta.2",
   "description": "Worldscapes - server engine part",
   "homepage": "https://github.com/SFilinsky/worldscapes-engine/wiki/About-Engine",
   "keywords": [
@@ -37,7 +37,7 @@
     "prepare": "npm run clear && npm run build"
   },
   "dependencies": {
-    "@worldscapes/common": "^0.1.0-beta.0",
+    "@worldscapes/common": "^0.1.0-beta.2",
     "ws": "^8.4.0"
   },
   "devDependencies": {
