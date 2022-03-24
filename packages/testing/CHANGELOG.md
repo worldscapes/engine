@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.1.0-beta.2](https://github.com/worldscapes/engine/compare/v0.1.0-beta.1...v0.1.0-beta.2) (2022-03-24)
+
+
+### Bug Fixes
+
+* updated package.json to point to repository ([c5b8c53](https://github.com/worldscapes/engine/commit/c5b8c53bdb940e2a359140bc4ccbbc3f38dfb7c6))
+
+
+
+
+
 # [0.1.0-beta.1](https://github.com/worldscapes/engine/compare/v0.1.0-beta.0...v0.1.0-beta.1) (2022-03-24)
 
 **Note:** Version bump only for package @worldscapes/testing
