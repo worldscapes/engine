@@ -14,6 +14,15 @@
     "email": "sfilisnky@gmail.com"
   },
   "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/worldscapes/engine.git",
+    "directory": "./"
+  },
+  "publishConfig": {
+    "access": "public",
+    "allow-same-version": true
+  },
   "scripts": {
     "bootstrap": "lerna bootstrap --hoist --strict",
     "clear:all": "lerna run --parallel clear",

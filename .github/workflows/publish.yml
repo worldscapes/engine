@@ -57,4 +57,4 @@ jobs:
 
     - name: "Publish"
       run: |
-        npx lerna publish from-package --yes --no-verify-access
+        npx lerna publish from-package --no-verify-access --yes
