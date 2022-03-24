@@ -16,8 +16,8 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      GH_TOKEN: ${{ secrets.GITHUB_PAT }}
-      GITHUB_TOKEN: ${{ secrets.GITHUB_PAT }}
+      GH_TOKEN: ${{ secrets.PUBLISH_PAT }}
+      GITHUB_TOKEN: ${{ secrets.PUBLISH_PAT }}
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
     steps:
