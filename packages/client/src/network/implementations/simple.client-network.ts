@@ -1,12 +1,12 @@
+import { NetworkClientApi } from "../client-network.api";
 import {
   NetworkAdapterApi,
   NetworkMessage,
   NetworkMessageMapper,
-  UserAction,
-  WorldStateSnapshot,
   UpdatedSnapshotMessage,
-} from "../../../../common";
-import { NetworkClientApi } from "../client-network.api";
+  UserAction,
+  WorldStateSnapshot
+} from "@worldscapes/common";
 
 export class UserInputMessage extends NetworkMessage {
   constructor(readonly input: UserAction[]) {

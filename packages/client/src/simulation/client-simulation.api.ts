@@ -1,4 +1,4 @@
-import { ECRTickResult, WorldStateSnapshot } from "../../../common";
+import { ECRTickResult, WorldStateSnapshot } from "@worldscapes/common";
 
 export abstract class ClientSimulationApi {
   public abstract runSimulationTick(): ECRTickResult;

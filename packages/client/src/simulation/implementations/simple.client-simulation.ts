@@ -1,9 +1,4 @@
-import {
-  ECRApi,
-  ECRTickResult,
-  LoadSnapshotCommand,
-  WorldStateSnapshot,
-} from "../../../../common";
+import {ECRApi, ECRTickResult, LoadSnapshotCommand, WorldStateSnapshot} from "@worldscapes/common";
 import { ClientSimulationApi } from "../client-simulation.api";
 
 export class SimpleClientSimulation extends ClientSimulationApi {
