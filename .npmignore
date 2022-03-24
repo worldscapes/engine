@@ -3,7 +3,7 @@ src
 .idea/
 docs/typedoc/
 testing
-.nodemon
+.nodemon/
 .github
 .eslintignore
 .eslintrc
