@@ -16,6 +16,15 @@
     "email": "sfilisnky@gmail.com"
   },
   "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/worldscapes/engine.git",
+    "directory": "packages/client"
+  },
+  "publishConfig": {
+    "access": "public",
+    "allow-same-version": true
+  },
   "scripts": {
     "clear": "del-cli --force ./dist",
     "build": "tsc",
