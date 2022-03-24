@@ -22,5 +22,10 @@
     "keywords": [],
     "author": "",
     "license": "ISC",
-    "description": ""
+    "description": "",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/worldscapes/engine.git",
+        "directory": "packages/testing"
+    }
 }

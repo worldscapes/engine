@@ -2,6 +2,11 @@
   "name": "@worldscapes/testing-client",
   "version": "0.1.0-beta.1",
   "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/worldscapes/engine.git",
+    "directory": "packages/testing-client"
+  },
   "scripts": {
     "ng": "ng",
     "start": "npx kill-port 4200 && ng serve",
