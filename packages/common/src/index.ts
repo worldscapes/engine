@@ -21,12 +21,13 @@ export * from "./ecr/store/store.api";
 export * from "./ecr/store/store.api.tools";
 export * from "./ecr/store/implementations/simple.store";
 export * from "./ecr/store/request/request";
+export * from "./ecr/user-action/user-action";
 
 // Network
 export * from "./network/adapter/adapter.api";
 export * from "./network/message/message";
 export * from "./network/message/built-in/updated-snapshot.message";
-export * from "./network/user-action/user-action";
+export * from "./network/message/built-in/user-input.message";
 
 // Typing
 export * from "./typing/WSCStructure";

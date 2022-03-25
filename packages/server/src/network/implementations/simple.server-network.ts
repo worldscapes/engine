@@ -3,11 +3,11 @@ import {
   NetworkMessageMapper,
   UpdatedSnapshotMessage,
   UserAction,
-  WorldStateSnapshot,
   UserId,
-} from "../../../../common";
+  UserInputMessage,
+  WorldStateSnapshot
+} from "@worldscapes/common";
 import { NetworkServerApi } from "../server-network.api";
-import { UserInputMessage } from "../../../../client";
 
 export class SimpleNetworkServer extends NetworkServerApi {
   protected accumulatedUserInput: Record<UserId, UserAction[]> = {};
