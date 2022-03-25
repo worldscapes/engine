@@ -26,6 +26,7 @@
   "scripts": {
     "bootstrap": "lerna bootstrap --hoist --strict",
     "clear:all": "lerna run --parallel clear",
+    "start": "npm run start:all",
     "start:all": "lerna run --parallel start",
     "start:all:clear": "npm run clear:all && npm run bootstrap && npm run start:all",
     "build:all": "lerna run --parallel build",
@@ -56,7 +57,9 @@
     "prettier": "^2.3.1",
     "ts-jest": "^27.1.3",
     "ts-node": "^10.5.0",
-    "typescript": "^4.3.2"
+    "typescript": "^4.3.2",
+    "eslint-import-resolver-typescript": "^2.7.0",
+    "eslint-plugin-import": "^2.25.4"
   },
   "husky": {
     "hooks": {

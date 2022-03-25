@@ -2,6 +2,7 @@
   "ignorePatterns": [
     "projects/**/*"
   ],
+  "root": true,
   "rules": {
     "no-console": "off"
   },
