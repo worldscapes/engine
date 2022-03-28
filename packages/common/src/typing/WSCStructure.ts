@@ -26,10 +26,10 @@ export function getObjectType<T extends WSCStructure>(object: T): string {
   return object.typeChain[0];
 }
 
-export function isTypeOf<T extends WSCStructure>(
+export function isTypeOf<T extends WSCStructure, R extends T>(
   object: T,
-  type: Constructor<T>
-): boolean {
+  type: Constructor<R>
+): object is R {
   return object.typeChain.includes(type.prototype.constructor.name);
 }
 
