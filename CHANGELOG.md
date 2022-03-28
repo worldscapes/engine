@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.1.0-beta.3](https://github.com/worldscapes/engine/compare/v0.1.0-beta.2...v0.1.0-beta.3) (2022-03-25)
+
+
+### Bug Fixes
+
+* added publishConfig and repository to root package.json ([9174562](https://github.com/worldscapes/engine/commit/91745629ca83bd24043bff4009e2403da0c1bdd8))
+* remove .nodemon from package ([87bcdc6](https://github.com/worldscapes/engine/commit/87bcdc6a0393f679329eb0688ef2f97c97d138b7))
+* update publish.yml to publish from-package ([3afcc9e](https://github.com/worldscapes/engine/commit/3afcc9efa84668d4868b161c8d6aee21f9399581))
+* updated node auth token ([fa468aa](https://github.com/worldscapes/engine/commit/fa468aa97f80eeb560b548ac25a4d8a533ac2746))
+
+
+### Features
+
+* updated engine exports ([b71bc5a](https://github.com/worldscapes/engine/commit/b71bc5a96f65f9117d8f521c7ef32fe8f8449787))
+
+
+
+
+
 # [0.1.0-beta.2](https://github.com/worldscapes/engine/compare/v0.1.0-beta.1...v0.1.0-beta.2) (2022-03-24)
 
 
