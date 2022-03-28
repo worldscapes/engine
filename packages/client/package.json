@@ -2,7 +2,7 @@
   "name": "@worldscapes/client",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "version": "0.1.0-beta.3",
+  "version": "0.1.0-beta.4",
   "description": "Worldscapes - client engine part",
   "homepage": "https://github.com/SFilinsky/worldscapes-engine/wiki/About-Engine",
   "keywords": [
@@ -39,6 +39,6 @@
     "preversion": "npm run lint"
   },
   "dependencies": {
-    "@worldscapes/common": "^0.1.0-beta.3"
+    "@worldscapes/common": "^0.1.0-beta.4"
   }
 }

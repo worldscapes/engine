@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.1.0-beta.4](https://github.com/worldscapes/engine/compare/v0.1.0-beta.3...v0.1.0-beta.4) (2022-03-28)
+
+
+### Features
+
+* improved isTypeOf() ([05f8d18](https://github.com/worldscapes/engine/commit/05f8d182891bbd576913dee093b50d0a15408953))
+* updated publish.yml to auth with .npmrc ([5d13c8c](https://github.com/worldscapes/engine/commit/5d13c8c6da266240459a15fb1bee748ac301c933))
+
+
+
+
+
 # [0.1.0-beta.3](https://github.com/worldscapes/engine/compare/v0.1.0-beta.2...v0.1.0-beta.3) (2022-03-25)
 
 
