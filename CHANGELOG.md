@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.1.0-beta.5](https://github.com/worldscapes/engine/compare/v0.1.0-beta.4...v0.1.0-beta.5) (2022-03-29)
+
+
+### Features
+
+* added way to assign predefined Entity ids ([1283dce](https://github.com/worldscapes/engine/commit/1283dceaebca44796206f25c70cd278abe3c2276))
+
+
+
+
+
 # [0.1.0-beta.4](https://github.com/worldscapes/engine/compare/v0.1.0-beta.3...v0.1.0-beta.4) (2022-03-28)
 
 
