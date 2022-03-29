@@ -12,7 +12,7 @@ export abstract class ECRStore {
     query: T
   ): ReturnType<StoreQuerySubscription<T>["getCurrentData"]>;
 
-  abstract createEntity(): number;
+  abstract createEntity(predefinedId?: number): number;
 
   abstract deleteEntity(entityId: number): void;
 

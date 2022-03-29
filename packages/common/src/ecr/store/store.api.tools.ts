@@ -77,9 +77,22 @@ export namespace ECRStoreTools {
       });
 
       describe("createEntity", () => {
-        test("Should create entity", () => {
+        test("Should create entity with positive id", () => {
           store.createEntity();
           expect(store.getSnapshot().entities).toHaveLength(1);
+          expect(store.getSnapshot().entities[0].id).toBeGreaterThan(0);
+        });
+
+
+        test("Should create entity with predefined id", () => {
+          store.createEntity(-5);
+          expect(store.getSnapshot().entities).toContainEqual({ id: -5 });
+        });
+
+
+        test("Should throw when predefined id is taken", () => {
+          store.createEntity(-5);
+          expect(() => store.createEntity(-5)).toThrow();
         });
       });
 
