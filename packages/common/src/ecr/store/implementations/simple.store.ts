@@ -112,17 +112,25 @@ export class SimpleStore extends ECRStore {
     };
   }
 
-  createEntity(): number {
-    const lastId =
-      this.entities.length !== 0
-        ? this.entities[this.entities.length - 1].id
-        : 0;
+  createEntity(predefinedId?: number): number {
 
-    const entity = new ECREntity(lastId + 1);
+    if (predefinedId && this.entities.find(entity => entity.id === predefinedId)) {
+      throw new Error(`Trying to take predefined id [${predefinedId}] which is already taken`);
+    }
+
+    const idToTake =
+      predefinedId ?
+        predefinedId
+        :
+      this.entities.length !== 0
+        ? this.entities[this.entities.length - 1].id + 1
+        : 1;
+
+    const entity = new ECREntity(idToTake);
     this.entities.push(entity);
     this.components[entity.id] = [];
 
-    return lastId + 1;
+    return idToTake;
   }
 
   deleteEntity(entityId: number): void {

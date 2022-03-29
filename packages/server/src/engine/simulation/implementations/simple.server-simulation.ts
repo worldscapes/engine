@@ -9,7 +9,7 @@ import {
   UpdateResourceCommand,
   UserAction,
   UserId,
-  getObjectType,
+  getObjectType, Constructor, WSCStructure,
 } from "@worldscapes/common";
 import { ServerSimulationApi } from "../server-simulation.api";
 
@@ -29,6 +29,16 @@ export class UserActionResource<
   }
 }
 
+export function getActionResourceName(action: UserAction | Constructor<UserAction> | string): string {
+  if (typeof action === "string") {
+    return "action_" + action;
+  } else if (action['name']) {
+    return "action_" + (action as Constructor<UserAction>).name;
+  } else {
+    return "action_" + getObjectType(action as WSCStructure);
+  }
+}
+
 export class SimpleServerSimulation extends ServerSimulationApi {
   constructor(protected ecr: ECRApi) {
     super();
@@ -43,7 +53,7 @@ export class SimpleServerSimulation extends ServerSimulationApi {
               entity: {},
               resource: {
                 oldResource: new StoreResourceRequest<UserActionResource>(
-                  this.actionResourceName(actionName)
+                  getActionResourceName(actionName)
                 ),
               },
             }).resource.oldResource;
@@ -70,7 +80,7 @@ export class SimpleServerSimulation extends ServerSimulationApi {
 
             resultCommands.push(
               new UpdateResourceCommand(
-                this.actionResourceName(actionName),
+                getActionResourceName(actionName),
                 newResource
               )
             );
@@ -106,24 +116,12 @@ export class SimpleServerSimulation extends ServerSimulationApi {
       for (let j = 0; j < playerActions.length; j++) {
         const currentAction = playerActions[j];
 
-        processedInput[getObjectType(currentAction)] =
-          processedInput[getObjectType(currentAction)] ?? [];
-        processedInput[getObjectType(currentAction)][currentPlayerId] =
-          processedInput[getObjectType(currentAction)][currentPlayerId] ?? [];
-        processedInput[getObjectType(currentAction)][currentPlayerId].push(
-          currentAction
-        );
+        processedInput[getObjectType(currentAction)] = processedInput[getObjectType(currentAction)] ?? [];
+        processedInput[getObjectType(currentAction)][currentPlayerId] = processedInput[getObjectType(currentAction)][currentPlayerId] ?? [];
+        processedInput[getObjectType(currentAction)][currentPlayerId].push(currentAction);
       }
     }
 
     this.ecr.injectCommands([new AddInputCommand(processedInput)]);
-  }
-
-  protected actionResourceName(action: UserAction | string): string {
-    if (typeof action !== "string") {
-      return "action_" + getObjectType(action);
-    } else {
-      return "action_" + action;
-    }
   }
 }

@@ -4,7 +4,12 @@ import { AddComponentCommand } from "./add-component.command";
 import { ECRCommand } from "../command";
 
 export class CreateEntityCommand extends ECRCommand {
-  constructor(readonly components: ECRComponent[] = []) {
+  constructor(
+      readonly components: ECRComponent[] = [],
+      readonly options?: {
+          predefinedId: number
+      }
+  ) {
     super();
   }
 }
@@ -12,7 +17,7 @@ export class CreateEntityCommand extends ECRCommand {
 export const createEntityHandler = createCommandHandler(
   CreateEntityCommand,
   (command, store) => {
-    const entityId = store.createEntity();
+    const entityId = store.createEntity(command.options?.predefinedId);
     return command.components.map(
       (component) => new AddComponentCommand(entityId, component)
     );
