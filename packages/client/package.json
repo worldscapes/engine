@@ -31,7 +31,7 @@
     "start": "nodemon --config ../../.nodemon/nodemon.json",
     "start:clean": "npm run clear && npm run start",
     "test": "jest --passWithNoTests",
-    "test:coverage": "npm run test --collectCoverage",
+    "test:coverage": "npm run test -- --collectCoverage",
     "lint": "eslint ./src --ext .ts --f table",
     "format": "prettier --write \"src/**/*.ts\"",
     "prepare": "npm run clear && npm run build",

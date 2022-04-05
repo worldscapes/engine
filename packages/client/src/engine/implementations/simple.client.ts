@@ -1,5 +1,4 @@
 import { WorldscapesClientApi } from "../worldscapes-client.api";
-import { DisplayApi } from "../../display/display.api";
 import { ClientSimulationApi } from "../../simulation/client-simulation.api";
 import { NetworkClientApi } from "../../network/client-network.api";
 import { UserAction } from "@worldscapes/common";
@@ -13,10 +12,11 @@ export class SimpleEngineClient extends WorldscapesClientApi {
   protected defaultOptions: SimpleEngineClientOptions = { inputBatchingInterval: 16 };
   protected options: SimpleEngineClientOptions;
 
+  protected unhandledInput: UserAction[] = [];
+
   constructor(
     protected simulation: ClientSimulationApi,
     protected network: NetworkClientApi,
-    protected display: DisplayApi,
     options?: Partial<SimpleEngineClientOptions>
   ) {
     super();
@@ -28,16 +28,12 @@ export class SimpleEngineClient extends WorldscapesClientApi {
   }
 
   public start(): void {
-    let unhandledInput: UserAction[] = [];
-    this.display.onInput = (event) => {
-      unhandledInput.push(event);
-    };
 
     setInterval(() => {
       // Send accumulated user input to server
-      if (unhandledInput?.length > 0) {
-        this.network.sendUserActions(unhandledInput);
-        unhandledInput = [];
+      if (this.unhandledInput?.length > 0) {
+        this.network.sendUserActions(this.unhandledInput);
+        this.unhandledInput = [];
       }
 
       // Apply changes from server
@@ -49,7 +45,10 @@ export class SimpleEngineClient extends WorldscapesClientApi {
       // Run simulation
       const simulationResult = this.simulation.runSimulationTick();
 
-      this.display.takeUpdatedSnapshot?.(simulationResult.snapshot);
     }, this.options.inputBatchingInterval);
+  }
+
+  public onInput(event: UserAction): void {
+    this.unhandledInput.push(event);
   }
 }

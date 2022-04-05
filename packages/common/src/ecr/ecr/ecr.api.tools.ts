@@ -269,6 +269,140 @@ export namespace ECRApiTools {
         });
       });
 
+      describe("subscribeDataQuery", () => {
+        let dataQuery: ECRQuery;
+        let testSnapshot: WorldStateSnapshot;
+
+        beforeEach(() => {
+          dataQuery = ECRQuery.create({
+            entity: {
+              check: new EntityRequest({
+                testComponent1: new ComponentSelector(
+                    ComponentPurposes.CHECK,
+                    TestComponent
+                ),
+              }),
+              has: new EntityRequest({
+                testComponent1: new ComponentSelector(
+                    ComponentPurposes.HAS,
+                    TestComponent
+                ),
+              }),
+              has_not: new EntityRequest({
+                testComponent1: new ComponentSelector(
+                    ComponentPurposes.HAS_NOT,
+                    TestComponent
+                ),
+              }),
+              write: new EntityRequest({
+                testComponent1: new ComponentSelector(
+                    ComponentPurposes.WRITE,
+                    TestComponent
+                ),
+              }),
+              read: new EntityRequest({
+                testComponent1: new ComponentSelector(
+                    ComponentPurposes.READ,
+                    TestComponent
+                ),
+              }),
+            },
+            resource: {
+              check: new ResourceRequest(
+                  ResourcePurposes.CHECK,
+                  "testResource1"
+              ),
+              read: new ResourceRequest(ResourcePurposes.READ, "testResource1"),
+              write: new ResourceRequest(
+                  ResourcePurposes.WRITE,
+                  "testResource1"
+              ),
+            },
+          });
+
+          testSnapshot = {
+            entities: [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }],
+            components: {
+              1: [removePrototype(new TestComponent(1))],
+              2: [removePrototype(new TestComponent2(1))],
+              3: [
+                removePrototype(new TestComponent(1)),
+                removePrototype(new TestComponent2(1)),
+              ],
+              4: [],
+            },
+            resources: {
+              testResource1: removePrototype(new TestResource(1)),
+              testResource2: removePrototype(new TestResource2(2)),
+            },
+          };
+
+          ecr.injectCommands([new LoadSnapshotCommand(testSnapshot)]);
+        });
+
+        test("Should call data query handler on initial tick", () => {
+          expect.assertions(1);
+
+          ecr.subscribeDataQuery(dataQuery, (data) => {
+
+            expect(data).toEqual({
+              entity: {
+                check: [{ entityId: 1 }, { entityId: 3 }],
+                write: [{ entityId: 1 }, { entityId: 3 }],
+                read: [
+                  { entityId: 1, testComponent1: new TestComponent(1) },
+                  { entityId: 3, testComponent1: new TestComponent(1) },
+                ],
+                has: [{ entityId: 1 }, { entityId: 3 }],
+                has_not: [{ entityId: 2 }, { entityId: 4 }],
+              },
+              resource: {
+                read: new TestResource(1),
+              },
+            });
+          });
+
+          ecr.runSimulationTick();
+        });
+
+        test("Should call data query handler on data update", () => {
+          expect.assertions(1);
+
+          let calls = 0;
+
+
+          ecr.subscribeDataQuery(dataQuery, (data) => {
+
+            if (calls < 1) {
+              calls += 1;
+              ecr.injectCommands([
+                  new UpdateComponentCommand(data.entity.read[0].entityId, data.entity.read[0].testComponent1, new TestComponent(2))
+              ]);
+              return;
+            }
+
+            expect(data).toEqual({
+              entity: {
+                check: [{ entityId: 1 }, { entityId: 3 }],
+                write: [{ entityId: 1 }, { entityId: 3 }],
+                read: [
+                  { entityId: 1, testComponent1: new TestComponent(2) },
+                  { entityId: 3, testComponent1: new TestComponent(1) },
+                ],
+                has: [{ entityId: 1 }, { entityId: 3 }],
+                has_not: [{ entityId: 2 }, { entityId: 4 }],
+              },
+              resource: {
+                read: new TestResource(1),
+              },
+            });
+          });
+
+          ecr.runSimulationTick();
+          ecr.runSimulationTick();
+        });
+      });
+
       describe("addRule", () => {
         let emptyQuery: ECRQuery;
         let resultTestQuery: ECRQuery;
@@ -370,7 +504,7 @@ export namespace ECRApiTools {
           expect(body).toBeCalledTimes(1);
         });
 
-        test("Should call custom rule body when condition returns true", () => {
+        test("Should not call custom rule body when condition returns false", () => {
           const rule = ECRRule.create({
             query: emptyQuery,
             condition: jest.fn(() => false),

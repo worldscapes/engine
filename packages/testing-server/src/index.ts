@@ -4,7 +4,6 @@ import {
   ComponentSelector,
   CreateEntityCommand,
   DeleteResourceCommand,
-  ECRComponent,
   ECRRule,
   EntityRequest,
   getTypeName,
@@ -12,17 +11,9 @@ import {
   ResourceRequest,
   SimpleEcr,
   UpdateComponentCommand,
-  UserAction,
 } from "@worldscapes/common";
 import {SimpleEngineServer, SimpleNetworkServer, SimpleServerSimulation, UserActionResource, WebsocketServerNetworkAdapter} from "@worldscapes/server";
-
-class CardShuffle extends ECRComponent {
-  constructor(readonly cards: typeof testCards[number][] = []) {
-    super();
-  }
-}
-
-class AddOneCardAction extends UserAction {}
+import {AddOneCardAction, CardShuffle, TEST_CARDS} from "@worldscapes/testing-common";
 
 const query = {
   entity: {
@@ -37,29 +28,6 @@ const query = {
     >(ResourcePurposes.CHECK, "test"),
   },
 };
-
-const testCards = [
-  {
-    name: "six",
-    value: 1,
-  },
-  {
-    name: "seven",
-    value: 2,
-  },
-  {
-    name: "eight",
-    value: 3,
-  },
-  {
-    name: "nine",
-    value: 4,
-  },
-  {
-    name: "ten",
-    value: 5,
-  },
-];
 
 const createCardCollectionRule = ECRRule.create({
   query: {
@@ -98,7 +66,7 @@ const addOneCardOnInputRule = ECRRule.create({
     );
   },
   body: ({ entity: { shuffles } }) => {
-    const randomCard = testCards[Math.floor(Math.random() * testCards.length)];
+    const randomCard = TEST_CARDS[Math.floor(Math.random() * TEST_CARDS.length)];
 
     return [
       new UpdateComponentCommand(

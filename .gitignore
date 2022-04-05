@@ -6,3 +6,4 @@ node_modules/
 dist/
 testing/dist/
 coverage/
+*.iml

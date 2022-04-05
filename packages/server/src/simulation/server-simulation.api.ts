@@ -1,4 +1,4 @@
-import { ECRTickResult, UserAction, UserId } from "../../../../common";
+import { ECRTickResult, UserAction, UserId } from "@worldscapes/common";
 
 export abstract class ServerSimulationApi {
   public abstract runSimulationTick(): ECRTickResult;

@@ -4,9 +4,6 @@ import { ECRResource } from "../state/resource/resource";
 import { StoreQuerySubscription, StoreQuery } from "./request/request";
 
 export abstract class ECRStore {
-  abstract subscribeQuery<T extends StoreQuery>(
-    query: T
-  ): StoreQuerySubscription<T>;
 
   abstract executeQuery<T extends StoreQuery>(
     query: T

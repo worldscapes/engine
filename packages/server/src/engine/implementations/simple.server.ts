@@ -1,6 +1,6 @@
 import { WorldscapesServerApi } from "../worldscapes-server.api";
 import { NetworkServerApi } from "../../network/server-network.api";
-import { ServerSimulationApi } from "../simulation/server-simulation.api";
+import { ServerSimulationApi } from "../../simulation/server-simulation.api";
 
 export interface SimpleEngineServerOptions {
   simulationTickInterval: number
