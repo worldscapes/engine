@@ -5,7 +5,6 @@ import {
   StoreEntityRequest,
   StoreResourceRequest,
   StoreQueryResult,
-  StoreQuerySubscription,
   StoreQuery,
   StoreComponentSelector,
   StoreReturnComponentPurpose,
@@ -102,14 +101,6 @@ export class SimpleStore extends ECRStore {
     });
 
     return result as StoreQueryResult<T, StoreReturnComponentPurpose>;
-  }
-
-  subscribeQuery<T extends StoreQuery>(query: T): StoreQuerySubscription<T> {
-    return {
-      getCurrentData: () => {
-        return this.executeQuery(query);
-      },
-    };
   }
 
   createEntity(predefinedId?: number): number {

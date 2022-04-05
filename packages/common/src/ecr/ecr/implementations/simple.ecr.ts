@@ -47,13 +47,18 @@ import {
 import { ECRComponent } from "../../state/component/component";
 import { ECRResource } from "../../state/resource/resource";
 import { getObjectType } from "../../../typing/WSCStructure";
-import { ECRApi, ECRTickResult } from "../ecr.api";
+import {DataQueryPurposes, DataQuerySubscriptionHandler, ECRApi, ECRTickResult} from "../ecr.api";
 import { loadSnapshotHandler } from "../../command/built-in/load-snapshot.command";
 
 export interface WorldStateSnapshot {
   entities: ECREntity[];
   components: Record<number, ECRComponent[]>;
   resources: Record<string, ECRResource>;
+}
+
+interface DataQuerySubscriptionInfo {
+  handler: DataQuerySubscriptionHandler,
+  convertedQuery: StoreQuery
 }
 
 /**
@@ -80,13 +85,15 @@ export class SimpleEcr extends ECRApi {
   ];
 
   protected rules: ECRRule[] = [];
+  protected convertedQueryMap = new Map<ECRRule, StoreQuery>();
+
   protected commandHandlers: ECRCommandHandler[] = [
     ...this.builtInCommandHandlers,
   ];
 
   protected injectedCommands: ECRCommand[] = [];
 
-  protected querySubMap = new Map<ECRRule, StoreQuerySubscription>();
+  protected dataQuerySubMap = new Map<ECRQuery, DataQuerySubscriptionInfo>();
 
   constructor(readonly store: ECRStore = new SimpleStore()) {
     super();
@@ -101,12 +108,13 @@ export class SimpleEcr extends ECRApi {
 
     // Handle rules
     this.rules.forEach((rule) => {
+
       // Get query data
-      const querySub = this.querySubMap.get(rule);
-      if (!querySub) {
+      const storeQuery = this.convertedQueryMap.get(rule);
+      if (!storeQuery) {
         return;
       }
-      const data = querySub.getCurrentData();
+      const data = this.store.executeQuery(storeQuery);
 
       // Condition - Check, Read, Write
       const dataForCondition = this.filterResult(
@@ -127,6 +135,14 @@ export class SimpleEcr extends ECRApi {
       allCommands.push(...this.handleCommands(commands));
     });
 
+    // Execute all Data Queries
+
+    Array.from(this.dataQuerySubMap.entries()).forEach(([query, info]) => {
+      const data = this.store.executeQuery(info.convertedQuery);
+      const dataForHandler = this.filterResult(data, query, DataQueryPurposes);
+      info.handler(dataForHandler);
+    });
+
     return {
       snapshot: this.store.getSnapshot(),
       commands: allCommands,
@@ -136,14 +152,22 @@ export class SimpleEcr extends ECRApi {
   public addRule<T extends ECRQuery>(rule: ECRRule<T>): SimpleEcr {
     this.rules.push(rule as unknown as ECRRule);
 
-    const storeQuery = this.convertSimulationQueryToStoreQuery(rule.query);
-
-    this.querySubMap.set(
+    this.convertedQueryMap.set(
       rule as unknown as ECRRule,
-      this.store.subscribeQuery(storeQuery)
+      this.convertSimulationQueryToStoreQuery(rule.query)
     );
 
     return this;
+  }
+
+  public subscribeDataQuery<T extends ECRQuery>(query: T, handler: DataQuerySubscriptionHandler<T>): void {
+    this.dataQuerySubMap.set(
+        query,
+        {
+          handler: handler as unknown as DataQuerySubscriptionHandler,
+          convertedQuery: this.convertSimulationQueryToStoreQuery(query)
+        }
+    );
   }
 
   public addCustomCommandHandler<T extends ECRCommandEffect>(

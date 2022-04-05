@@ -318,43 +318,6 @@ export namespace ECRStoreTools {
           });
         });
       });
-
-      describe("subscribeToQuery", () => {
-        test("Should return actual value for subscriber", () => {
-          store.loadSnapshot(testSnapshot);
-          const query = StoreQuery.create({
-            entity: {
-              test: new StoreEntityRequest({
-                has: new StoreComponentSelector(
-                  StoreComponentPurposes.HAS,
-                  TestComponent
-                ),
-              }),
-            },
-            resource: {
-              testResource: new StoreResourceRequest("test-resource"),
-            },
-          });
-          const subscription = store.subscribeQuery(query);
-          expect(subscription.getCurrentData()).toEqual({
-            entity: {
-              test: [{ entityId: 1 }, { entityId: 4 }],
-            },
-            resource: {
-              testResource: testSnapshot.resources["test-resource"],
-            },
-          });
-          store.addComponent(testSnapshot.entities[1].id, new TestComponent(0));
-          expect(subscription.getCurrentData()).toEqual({
-            entity: {
-              test: [{ entityId: 1 }, { entityId: 2 }, { entityId: 4 }],
-            },
-            resource: {
-              testResource: testSnapshot.resources["test-resource"],
-            },
-          });
-        });
-      });
     });
   }
 }

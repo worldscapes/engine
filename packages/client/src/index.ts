@@ -1,5 +1,3 @@
-export * from "./display/display.api";
-
 export * from "./engine/worldscapes-client.api";
 export * from "./engine/implementations/simple.client";
 

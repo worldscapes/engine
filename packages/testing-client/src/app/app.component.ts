@@ -1,14 +1,21 @@
 import { Component, OnInit } from '@angular/core';
 
-import {NetworkAdapterApi, SimpleEcr, UserAction, WorldStateSnapshot} from "@worldscapes/common";
 import {
-  DisplayApi,
+  ComponentPurposes, ComponentSelector,
+  ECRApi, ECRQuery, EntityRequest,
+  NetworkAdapterApi,
+  SimpleEcr,
+  UserAction,
+} from "@worldscapes/common";
+import {
   SimpleClientSimulation,
   SimpleEngineClient,
   SimpleNetworkClient,
   WebsocketClientNetworkAdapter,
   WorldscapesClientApi
 } from "@worldscapes/client";
+import { Observable, shareReplay } from 'rxjs';
+import {CardShuffle} from "@worldscapes/testing-common";
 
 class AddOneCardAction extends UserAction {}
 
@@ -20,37 +27,46 @@ class AddOneCardAction extends UserAction {}
 export class AppComponent implements OnInit {
   title = 'testing-client';
 
-  display!: DisplayApi;
   adapter!: NetworkAdapterApi;
   client!: WorldscapesClientApi;
+  ecr!: ECRApi;
 
-  snapshot!: WorldStateSnapshot;
   timestamp!: number;
+
+  cards!: Observable<any>;
 
   ngOnInit(): void {
     (async () => {
       this.adapter = new WebsocketClientNetworkAdapter("localhost");
       await this.adapter.isReady();
 
-      this.display = {
-        takeUpdatedSnapshot: this.updateSnapshot.bind(this)
-      };
+      this.ecr = new SimpleEcr();
+
+      this.cards = new Observable(observer => {
+        this.ecr.subscribeDataQuery(
+          ECRQuery.create({
+            entity: {
+              cards: new EntityRequest({
+                shuffle: new ComponentSelector(ComponentPurposes.READ, CardShuffle),
+              })
+            },
+            resource: {}
+          }),
+          (data) => {
+            observer.next(data.entity.cards.map(entity => entity.shuffle.cards));
+          }
+        )
+      }).pipe(shareReplay(1));
 
       this.client = new SimpleEngineClient(
-          new SimpleClientSimulation(new SimpleEcr()),
-          new SimpleNetworkClient(this.adapter),
-          this.display
+          new SimpleClientSimulation(this.ecr),
+          new SimpleNetworkClient(this.adapter)
       );
       this.client.start();
     })();
   }
 
-  updateSnapshot(snapshot: WorldStateSnapshot): void {
-    this.snapshot = snapshot;
-    this.timestamp = Date.now();
-  }
-
   addOneCard(): void {
-    this.display?.onInput?.(new AddOneCardAction());
+    this.client.onInput(new AddOneCardAction());
   }
 }

@@ -10,5 +10,7 @@
         <button (click)="addOneCard()"> Add Card </button>
         <span> {{ timestamp }} </span>
     </div>
-    <div> {{ snapshot | json }} </div>
+    <div>
+        <pre> {{ cards | async | json }} </pre>
+    </div>
 </div>
