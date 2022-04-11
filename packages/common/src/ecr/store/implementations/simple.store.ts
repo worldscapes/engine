@@ -23,6 +23,7 @@ export class ECREntity {
 
 export class SimpleStore extends ECRStore {
   protected entities: ECREntity[] = [];
+  protected lastPositiveId = 1;
   protected components: Record<number, ECRComponent[]> = {};
   protected resources: Record<string, ECRResource> = {};
 
@@ -109,13 +110,15 @@ export class SimpleStore extends ECRStore {
       throw new Error(`Trying to take predefined id [${predefinedId}] which is already taken`);
     }
 
-    const idToTake =
-      predefinedId ?
-        predefinedId
-        :
-      this.entities.length !== 0
-        ? this.entities[this.entities.length - 1].id + 1
-        : 1;
+    let idToTake;
+
+    if (predefinedId) {
+      idToTake = predefinedId;
+    } else {
+      idToTake = this.lastPositiveId;
+      this.lastPositiveId++;
+    }
+
 
     const entity = new ECREntity(idToTake);
     this.entities.push(entity);
