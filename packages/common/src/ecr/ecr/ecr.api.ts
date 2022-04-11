@@ -1,7 +1,7 @@
 import { ECRRule } from "../rule/rule";
 import { ECRCommand } from "../command/command";
 import { ECRCommandEffect, ECRCommandHandler } from "../command/command-hander";
-import {ECRQuery, ECRQueryResult, ReadComponentPurpose, ReadResourcePurpose} from "./request/request";
+import { ECRQuery, ECRQueryResult, ReadComponentPurpose, ReadResourcePurpose } from "./request/request";
 import { WorldStateSnapshot } from "./implementations/simple.ecr";
 
 export interface ECRTickResult {
@@ -14,8 +14,9 @@ export const DataQueryPurposes = [
   ReadResourcePurpose,
 ] as const;
 
-export type DataQuerySubscriptionHandler<T extends ECRQuery = ECRQuery> =
-    (result: ECRQueryResult<T, InstanceType<typeof DataQueryPurposes[number]>>) => void;
+export type DataQueryResult<T extends ECRQuery> = ECRQueryResult<T, InstanceType<typeof DataQueryPurposes[number]>>;
+
+export type DataQuerySubscriptionHandler<T extends ECRQuery = ECRQuery> = (result: DataQueryResult<T>) => void;
 
 export abstract class ECRApi {
   public abstract runSimulationTick(): ECRTickResult;
