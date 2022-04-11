@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.1.0-beta.9](https://github.com/worldscapes/engine/compare/v0.1.0-beta.8...v0.1.0-beta.9) (2022-04-11)
+
+
+### Features
+
+* Action Typing improvements ([c632c23](https://github.com/worldscapes/engine/commit/c632c2304192cc0772f0b902dc370341617488d4))
+
+
+
+
+
 # [0.1.0-beta.8](https://github.com/worldscapes/engine/compare/v0.1.0-beta.7...v0.1.0-beta.8) (2022-04-11)
 
 
