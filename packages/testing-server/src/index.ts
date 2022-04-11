@@ -7,7 +7,9 @@ import {
   SimpleEcr,
   UpdateComponentCommand,
   PlayerInfo,
-  UserActionTools, OwnedComponent,
+  PlayerActionTools,
+  OwnedComponent,
+  isSet
 } from "@worldscapes/common";
 import {SimpleEngineServer, SimpleNetworkServer, SimpleServerAuth, SimpleServerSimulation, WebsocketServerNetworkAdapter} from "@worldscapes/server";
 import {AddOneCardAction, CardShuffle, TEST_CARDS} from "@worldscapes/testing-common";
@@ -22,14 +24,10 @@ const initCommands = [
     new CreateEntityCommand([ new OwnedComponent(players[1].id), new CardShuffle([])]),
 ];
 
-function isSet<T>(value: T): value is Exclude<T, null | undefined> {
-  return !!value;
-}
-
 const addOneCardOnInputRule = ECRRule.create({
   query: {
     entity: {
-      actions: UserActionTools.CreateRequest(AddOneCardAction),
+      actions: PlayerActionTools.CreateRequest(AddOneCardAction),
       shuffles: new EntityRequest({
         owner: new ComponentSelector(ComponentPurposes.READ, OwnedComponent),
         shuffle: new ComponentSelector(ComponentPurposes.WRITE, CardShuffle),

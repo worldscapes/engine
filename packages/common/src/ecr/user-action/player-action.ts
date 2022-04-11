@@ -12,7 +12,7 @@ type ActionRequest<T extends PlayerAction> = EntityRequest<{
     action: ComponentSelector<T, typeof ComponentPurposes.READ>,
 }>;
 
-export namespace UserActionTools {
+export namespace PlayerActionTools {
 
     export function CreateRequest<T extends PlayerAction>(action: Constructor<T>): ActionRequest<T> {
 

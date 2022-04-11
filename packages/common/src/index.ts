@@ -45,3 +45,5 @@ export * from "./utility/classes/resolver";
 export * from "./utility/types/constructor";
 export * from "./utility/functions/get-class-name";
 export * from "./utility/functions/remove-prototype";
+export * from "./utility/guards/isDefined";
+export * from "./utility/guards/isSet";
