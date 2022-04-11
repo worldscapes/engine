@@ -2,7 +2,9 @@ import { ConnectionInfo, NetworkAdapterApi } from "../../adapter.api";
 import { LocalServerNetworkAdapter } from "./local-server.adapter";
 
 export class LocalClientNetworkAdapter extends NetworkAdapterApi {
-  constructor(protected serverAdapter?: LocalServerNetworkAdapter) {
+  constructor(
+      protected serverAdapter?: LocalServerNetworkAdapter
+  ) {
     super();
 
     if (serverAdapter) {
@@ -13,6 +15,7 @@ export class LocalClientNetworkAdapter extends NetworkAdapterApi {
   getConnectionList(): ConnectionInfo[] {
     return [
       {
+        playerId: "0",
         id: 1,
         rank: "server",
       },

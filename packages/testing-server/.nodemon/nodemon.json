@@ -2,6 +2,6 @@
   "ignore": ["**/*.test.ts", "**/*.spec.ts"],
   "watch": ["./src", "./node_modules"],
   "exec": "npm run build && npx kill-port 7020 && node ./dist/index",
-  "ext": "ts",
-  "delay": 2500
+  "ext": "ts,js",
+  "delay": 500
 }

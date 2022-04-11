@@ -1,13 +1,17 @@
 import { Component, OnInit } from '@angular/core';
 
 import {
-  ComponentPurposes, ComponentSelector,
-  ECRApi, ECRQuery, EntityRequest,
+  ComponentPurposes,
+  ComponentSelector,
+  ECRApi,
+  ECRQuery,
+  EntityRequest,
   NetworkAdapterApi,
   SimpleEcr,
-  UserAction,
+  PlayerAction, WorldStateSnapshot,
 } from "@worldscapes/common";
 import {
+  SimpleClientAuth,
   SimpleClientSimulation,
   SimpleEngineClient,
   SimpleNetworkClient,
@@ -17,7 +21,7 @@ import {
 import { Observable, shareReplay } from 'rxjs';
 import {CardShuffle} from "@worldscapes/testing-common";
 
-class AddOneCardAction extends UserAction {}
+class AddOneCardAction extends PlayerAction {}
 
 @Component({
   selector: 'app-root',
@@ -35,9 +39,14 @@ export class AppComponent implements OnInit {
 
   cards!: Observable<any>;
 
+  latestSnapshot!: WorldStateSnapshot;
+
   ngOnInit(): void {
     (async () => {
-      this.adapter = new WebsocketClientNetworkAdapter("localhost");
+      this.adapter = new WebsocketClientNetworkAdapter(
+          new SimpleClientAuth({ id: "2" }),
+      "localhost"
+      );
       await this.adapter.isReady();
 
       this.ecr = new SimpleEcr();
@@ -63,6 +72,8 @@ export class AppComponent implements OnInit {
           new SimpleNetworkClient(this.adapter)
       );
       this.client.start();
+
+      setInterval(() => this.latestSnapshot = this.client.getLatestSnapshot())
     })();
   }
 

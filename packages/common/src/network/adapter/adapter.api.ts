@@ -1,9 +1,11 @@
 import { Resolver } from "../../utility/classes/resolver";
+import {PlayerId} from "../../identity/player-info";
 
-export type UserId = number;
+export type ConnectionId = number;
 
 export interface ConnectionInfo {
-  id: UserId;
+  playerId: PlayerId;
+  id: ConnectionId;
   rank: "client" | "server" | string;
 }
 
@@ -18,7 +20,7 @@ export abstract class NetworkAdapterApi {
   onMessage!: (messageInfo: MessageInfo) => void;
 
   abstract sendMessageToAll(messageData: string): void;
-  abstract sendMessageById(targetId: UserId, messageData: string): void;
+  abstract sendMessageById(targetId: ConnectionId, messageData: string): void;
   abstract sendMessageByRank(targetRank: string, messageData: string): void;
   abstract getConnectionList(): ConnectionInfo[];
 

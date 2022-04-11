@@ -32,10 +32,9 @@ export class SimpleEngineServer extends WorldscapesServerApi {
 
       this.network.sendSnapshot(simulationResult.snapshot);
 
-      const userInput = this.network.getUserInput();
-
-      if (Object.keys(userInput).length > 0) {
-        this.simulation.handleUserInput(userInput);
+      const playerInput = this.network.getPlayerInput();
+      if (Object.keys(playerInput).length > 0) {
+        this.simulation.handleUserInput(playerInput);
       }
     }, this.options.simulationTickInterval);
   }

@@ -2,27 +2,29 @@ import {
   NetworkAdapterApi,
   NetworkMessageMapper,
   UpdatedSnapshotMessage,
-  UserAction,
-  UserId,
-  UserInputMessage,
+  PlayerAction,
+  PlayerId,
+  PlayerInputMessage,
   WorldStateSnapshot
 } from "@worldscapes/common";
 import { NetworkServerApi } from "../server-network.api";
 
 export class SimpleNetworkServer extends NetworkServerApi {
-  protected accumulatedUserInput: Record<UserId, UserAction[]> = {};
+  protected accumulatedPlayerInput: Record<PlayerId, PlayerAction[]> = {};
 
   protected mapper = new NetworkMessageMapper();
 
-  constructor(protected adapter: NetworkAdapterApi) {
+  constructor(
+      protected adapter: NetworkAdapterApi
+  ) {
     super();
 
     this.mapper.addMessageHandler(
-      UserInputMessage,
+      PlayerInputMessage,
       (message, connectionInfo) => {
-        this.accumulatedUserInput[connectionInfo.id] =
-          this.accumulatedUserInput[connectionInfo.id] ?? [];
-        this.accumulatedUserInput[connectionInfo.id].push(...message.input);
+        this.accumulatedPlayerInput[connectionInfo.playerId] =
+          this.accumulatedPlayerInput[connectionInfo.playerId] ?? [];
+        this.accumulatedPlayerInput[connectionInfo.playerId].push(...message.input);
       }
     );
 
@@ -38,9 +40,9 @@ export class SimpleNetworkServer extends NetworkServerApi {
     );
   }
 
-  getUserInput(): Record<UserId, UserAction[]> {
-    const input = this.accumulatedUserInput;
-    this.accumulatedUserInput = {};
+  getPlayerInput(): Record<PlayerId, PlayerAction[]> {
+    const input = this.accumulatedPlayerInput;
+    this.accumulatedPlayerInput = {};
     return input;
   }
 }

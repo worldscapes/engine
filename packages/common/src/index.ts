@@ -17,17 +17,25 @@ export * from "./ecr/ecr/ecr.api.tools";
 export * from "./ecr/ecr/implementations/simple.ecr";
 export * from "./ecr/state/resource/resource";
 export * from "./ecr/state/component/component";
+export * from "./ecr/state/component/built-in/owned.component";
+export * from "./ecr/state/component/built-in/player.component";
 export * from "./ecr/store/store.api";
 export * from "./ecr/store/store.api.tools";
 export * from "./ecr/store/implementations/simple.store";
 export * from "./ecr/store/request/request";
-export * from "./ecr/user-action/user-action";
+export * from "./ecr/user-action/player-action";
+
+// Identity
+export * from "./identity/player-info";
 
 // Network
+export * from "./network/auth/auth-server.api";
+export * from "./network/auth/auth-client.api";
+export * from "./network/auth/implementation/simple.auth";
 export * from "./network/adapter/adapter.api";
 export * from "./network/message/message";
 export * from "./network/message/built-in/updated-snapshot.message";
-export * from "./network/message/built-in/user-input.message";
+export * from "./network/message/built-in/player-input.message";
 
 // Typing
 export * from "./typing/WSCStructure";

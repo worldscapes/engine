@@ -1,6 +1,7 @@
-import {UserAction} from "@worldscapes/common";
+import {PlayerAction, WorldStateSnapshot} from "@worldscapes/common";
 
 export abstract class WorldscapesClientApi {
   public abstract start(): void;
-  public abstract onInput(event: UserAction): void;
+  public abstract onInput(event: PlayerAction): void;
+  public abstract getLatestSnapshot(): WorldStateSnapshot;
 }
