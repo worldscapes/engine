@@ -40,7 +40,6 @@ import {
   StoreHasNotComponentPurpose,
   StoreQuery,
   StoreQueryResult,
-  StoreQuerySubscription,
   StoreResourceRequest,
   StoreReturnComponentPurpose,
 } from "../../store/request/request";

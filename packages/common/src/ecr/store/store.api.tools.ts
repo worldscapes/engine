@@ -78,21 +78,33 @@ export namespace ECRStoreTools {
 
       describe("createEntity", () => {
         test("Should create entity with positive id", () => {
-          store.createEntity();
+          const entityId = store.createEntity();
           expect(store.getSnapshot().entities).toHaveLength(1);
+          expect(store.getSnapshot().entities[0].id).toEqual(entityId);
           expect(store.getSnapshot().entities[0].id).toBeGreaterThan(0);
         });
 
 
         test("Should create entity with predefined id", () => {
-          store.createEntity(-5);
+          const entityId = store.createEntity(-5);
+          const entityId2 = store.createEntity(-6);
+
+          expect(entityId).toEqual(-5);
           expect(store.getSnapshot().entities).toContainEqual({ id: -5 });
+          expect(entityId2).toEqual(-6);
+          expect(store.getSnapshot().entities).toContainEqual({ id: -6 });
         });
 
 
         test("Should throw when predefined id is taken", () => {
           store.createEntity(-5);
           expect(() => store.createEntity(-5)).toThrow();
+        });
+
+        test("Should assigned positive id even is negative id is taken", () => {
+          store.createEntity(-5);
+          const entityId = store.createEntity();
+          expect(entityId).toBeGreaterThan(0);
         });
       });
 
