@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.1.0-beta.8](https://github.com/worldscapes/engine/compare/v0.1.0-beta.7...v0.1.0-beta.8) (2022-04-11)
+
+
+### Features
+
+* added AuthClientApi and AuthServerApi with their Simple implementations ([62b7e57](https://github.com/worldscapes/engine/commit/62b7e57f5dbd2c655874aba0422f2c91bea450f8))
+
+
+
+
+
 # [0.1.0-beta.7](https://github.com/worldscapes/engine/compare/v0.1.0-beta.6...v0.1.0-beta.7) (2022-04-07)
 
 **Note:** Version bump only for package @worldscapes/client
