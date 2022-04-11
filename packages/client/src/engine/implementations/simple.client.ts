@@ -1,7 +1,7 @@
 import { WorldscapesClientApi } from "../worldscapes-client.api";
 import { ClientSimulationApi } from "../../simulation/client-simulation.api";
 import { NetworkClientApi } from "../../network/client-network.api";
-import { UserAction } from "@worldscapes/common";
+import {PlayerAction, WorldStateSnapshot} from "@worldscapes/common";
 
 export interface SimpleEngineClientOptions {
   inputBatchingInterval: number
@@ -12,7 +12,9 @@ export class SimpleEngineClient extends WorldscapesClientApi {
   protected defaultOptions: SimpleEngineClientOptions = { inputBatchingInterval: 16 };
   protected options: SimpleEngineClientOptions;
 
-  protected unhandledInput: UserAction[] = [];
+  protected unhandledInput: PlayerAction[] = [];
+
+  protected latestSnapshot!: WorldStateSnapshot;
 
   constructor(
     protected simulation: ClientSimulationApi,
@@ -32,7 +34,7 @@ export class SimpleEngineClient extends WorldscapesClientApi {
     setInterval(() => {
       // Send accumulated user input to server
       if (this.unhandledInput?.length > 0) {
-        this.network.sendUserActions(this.unhandledInput);
+        this.network.sendPlayerActions(this.unhandledInput);
         this.unhandledInput = [];
       }
 
@@ -43,12 +45,16 @@ export class SimpleEngineClient extends WorldscapesClientApi {
       }
 
       // Run simulation
-      const simulationResult = this.simulation.runSimulationTick();
+      this.latestSnapshot = this.simulation.runSimulationTick().snapshot;
 
     }, this.options.inputBatchingInterval);
   }
 
-  public onInput(event: UserAction): void {
+  public onInput(event: PlayerAction): void {
     this.unhandledInput.push(event);
+  }
+
+  public getLatestSnapshot(): WorldStateSnapshot {
+    return this.latestSnapshot;
   }
 }

@@ -1,4 +1,4 @@
-import {ECRComponent, UserAction} from "@worldscapes/common";
+import {ECRComponent, PlayerAction} from "@worldscapes/common";
 
 export class CardShuffle extends ECRComponent {
     constructor(readonly cards: typeof TEST_CARDS[number][] = []) {
@@ -6,7 +6,7 @@ export class CardShuffle extends ECRComponent {
     }
 }
 
-export class AddOneCardAction extends UserAction {}
+export class AddOneCardAction extends PlayerAction {}
 
 export const TEST_CARDS = [
     {

@@ -11,6 +11,7 @@ export class LocalServerNetworkAdapter extends NetworkAdapterApi {
   getConnectionList(): ConnectionInfo[] {
     return [
       {
+        playerId: "1",
         id: 1,
         rank: "client",
       },

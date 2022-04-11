@@ -1,20 +1,52 @@
-import {ConnectionInfo, NetworkAdapterApi } from "@worldscapes/common";
+import {
+  AuthServerApi,
+  ConnectionInfo,
+  isAuthResultReject,
+  NetworkAdapterApi, PlayerId
+} from "@worldscapes/common";
 import { WebSocket, WebSocketServer } from "ws";
+import {IncomingMessage} from "http";
+import * as crypto from "crypto-js";
 
 export class WebsocketServerNetworkAdapter extends NetworkAdapterApi {
+
   protected server: WebSocketServer;
 
   protected clients = new Map<WebSocket, ConnectionInfo>();
 
-  constructor(readonly port: number = 7020) {
+  constructor(
+      readonly auth: AuthServerApi,
+      readonly port: number = 7020,
+  ) {
     super();
 
     this.server = new WebSocketServer({
       port: this.port,
+      verifyClient: (info) => {
+
+        const slicedUrl = info.req.url?.slice(1, info.req.url?.length);
+        const hexToken = new URLSearchParams(slicedUrl).get("token");
+        if (!hexToken) {
+          return false;
+        }
+        const wordArray = crypto.enc.Hex.parse(hexToken);
+        const token = crypto.enc.Utf16.stringify(wordArray);
+
+        const authResult = this.auth.checkPlayer(token);
+
+        if (isAuthResultReject(authResult)) {
+          return false;
+        }
+
+        info.req['playerId'] = authResult.playerId;
+
+        return true;
+      }
     });
 
-    this.server.on("connection", (connection) => {
-      this.clients.set(connection, { id: Date.now(), rank: "client" });
+    this.server.on("connection", (connection, req: IncomingMessage & { playerId: PlayerId }) => {
+
+      this.clients.set(connection, { id: Date.now(), rank: "client", playerId: req.playerId });
 
       connection.on("message", (message) =>
         this.onMessage({
@@ -22,6 +54,10 @@ export class WebsocketServerNetworkAdapter extends NetworkAdapterApi {
           connectionInfo: this.clients.get(connection) as ConnectionInfo,
         })
       );
+
+      connection.on("close", () => {
+        this.clients.delete(connection);
+      });
     });
 
     this.readyResolver.resolve();

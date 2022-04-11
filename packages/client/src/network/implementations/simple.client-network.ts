@@ -3,9 +3,9 @@ import {
   NetworkAdapterApi,
   NetworkMessageMapper,
   UpdatedSnapshotMessage,
-  UserAction,
+  PlayerAction,
   WorldStateSnapshot,
-  UserInputMessage
+  PlayerInputMessage
 } from "@worldscapes/common";
 
 export class SimpleNetworkClient extends NetworkClientApi {
@@ -29,10 +29,10 @@ export class SimpleNetworkClient extends NetworkClientApi {
     return this.lastReceivedSnapshot;
   }
 
-  sendUserActions(input: UserAction[]): void {
+  sendPlayerActions(input: PlayerAction[]): void {
     this.adapter.sendMessageByRank(
       "server",
-      JSON.stringify(new UserInputMessage(input))
+      JSON.stringify(new PlayerInputMessage(input))
     );
   }
 }
