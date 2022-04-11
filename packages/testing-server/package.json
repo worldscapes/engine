@@ -1,6 +1,6 @@
 {
     "name": "@worldscapes/testing-server",
-    "version": "0.1.0-beta.9",
+    "version": "0.1.0-beta.10",
     "private": true,
     "type": "commonjs",
     "scripts": {
@@ -14,10 +14,10 @@
         "prepare": "npm run clear && npm run build"
     },
     "dependencies": {
-        "@worldscapes/client": "^0.1.0-beta.9",
-        "@worldscapes/common": "^0.1.0-beta.9",
-        "@worldscapes/server": "^0.1.0-beta.9",
-        "@worldscapes/testing-common": "^0.1.0-beta.9"
+        "@worldscapes/client": "^0.1.0-beta.10",
+        "@worldscapes/common": "^0.1.0-beta.10",
+        "@worldscapes/server": "^0.1.0-beta.10",
+        "@worldscapes/testing-common": "^0.1.0-beta.10"
     },
     "main": "index.js",
     "repository": {

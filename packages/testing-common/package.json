@@ -3,7 +3,7 @@
   "private": true,
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "version": "0.1.0-beta.9",
+  "version": "0.1.0-beta.10",
   "scripts": {
     "clear": "del-cli --force ./dist",
     "build": "tsc",
@@ -18,6 +18,6 @@
     "preversion": "npm run lint"
   },
   "dependencies": {
-    "@worldscapes/common": "^0.1.0-beta.9"
+    "@worldscapes/common": "^0.1.0-beta.10"
   }
 }
