@@ -33,6 +33,8 @@ export * from "./network/auth/auth-server.api";
 export * from "./network/auth/auth-client.api";
 export * from "./network/auth/implementation/simple.auth";
 export * from "./network/adapter/adapter.api";
+export * from "./network/serializer/serializer.api";
+export * from "./network/serializer/implementations/simple.serializer";
 export * from "./network/message/message";
 export * from "./network/message/built-in/updated-snapshot.message";
 export * from "./network/message/built-in/player-input.message";

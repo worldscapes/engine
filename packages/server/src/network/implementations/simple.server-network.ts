@@ -5,7 +5,7 @@ import {
   PlayerAction,
   PlayerId,
   PlayerInputMessage,
-  WorldStateSnapshot
+  WorldStateSnapshot, NetworkSerializerApi, SimpleSerializer
 } from "@worldscapes/common";
 import { NetworkServerApi } from "../server-network.api";
 
@@ -15,7 +15,8 @@ export class SimpleNetworkServer extends NetworkServerApi {
   protected mapper = new NetworkMessageMapper();
 
   constructor(
-      protected adapter: NetworkAdapterApi
+      protected adapter: NetworkAdapterApi,
+      protected serializer: NetworkSerializerApi = new SimpleSerializer(),
   ) {
     super();
 
@@ -29,14 +30,14 @@ export class SimpleNetworkServer extends NetworkServerApi {
     );
 
     adapter.onMessage = ({ messageText, connectionInfo }) => {
-      this.mapper.handleMessage(JSON.parse(messageText), connectionInfo);
+      this.mapper.handleMessage(this.serializer.parse(messageText), connectionInfo);
     };
   }
 
   sendSnapshot(snapshot: WorldStateSnapshot): void {
     this.adapter.sendMessageByRank(
       "client",
-      JSON.stringify(new UpdatedSnapshotMessage(snapshot))
+      this.serializer.stringify(new UpdatedSnapshotMessage(snapshot))
     );
   }
 
