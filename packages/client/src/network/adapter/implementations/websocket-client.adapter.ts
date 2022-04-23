@@ -7,14 +7,14 @@ export class WebsocketClientNetworkAdapter extends NetworkAdapterApi {
   constructor(
       readonly auth: AuthClientApi,
       readonly url: string,
-      readonly port: number = 7020,
+      readonly port: number | null = 7020,
   ) {
     super();
 
     const wordArray = crypto.enc.Utf16.parse(auth.getAuthInfoString());
     const hexToken = crypto.enc.Hex.stringify(wordArray);
 
-    this.socket = new WebSocket(`ws://${this.url}:${this.port}?token=${hexToken}`);
+    this.socket = new WebSocket(`ws://${this.url}${this.port ? ":" + this.port : ""}?token=${hexToken}`);
     this.socket.onerror = (error) => {
       console.error(error);
     };
