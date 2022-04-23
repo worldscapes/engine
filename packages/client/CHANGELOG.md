@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.1.0-beta.12](https://github.com/worldscapes/engine/compare/v0.1.0-beta.11...v0.1.0-beta.12) (2022-04-23)
+
+
+### Features
+
+* allow empty ports in websocket-client.adapter.ts ([596b4de](https://github.com/worldscapes/engine/commit/596b4dec09a00e4f040cd0fbe81f817b53cab000))
+
+
+
+
+
 # [0.1.0-beta.11](https://github.com/worldscapes/engine/compare/v0.1.0-beta.10...v0.1.0-beta.11) (2022-04-18)
 
 
