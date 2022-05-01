@@ -46,16 +46,25 @@ export class WebsocketServerNetworkAdapter extends NetworkAdapterApi {
 
     this.server.on("connection", (connection, req: IncomingMessage & { playerId: PlayerId }) => {
 
-      this.clients.set(connection, { id: Date.now(), rank: "client", playerId: req.playerId });
+      const connectionInfo = { id: Date.now(), rank: "client", playerId: req.playerId };
+
+      this.clients.set(connection, connectionInfo);
+      this.onConnection?.(connectionInfo);
 
       connection.on("message", (message) =>
-        this.onMessage({
+        this.onMessage?.({
           messageText: message.toString(),
-          connectionInfo: this.clients.get(connection) as ConnectionInfo,
+          connectionInfo: connectionInfo,
         })
       );
 
       connection.on("close", () => {
+        this.onDisconnection?.(this.clients.get(connection)!);
+        this.clients.delete(connection);
+      });
+
+      connection.on("error", () => {
+        this.onDisconnection?.(this.clients.get(connection)!);
         this.clients.delete(connection);
       });
     });

@@ -48,5 +48,11 @@ export class LocalServerNetworkAdapter extends NetworkAdapterApi {
 
   registerClient(clientAdapter: LocalClientNetworkAdapter): void {
     this.clientAdapter = clientAdapter;
+
+    this.onConnection?.({
+      playerId: "1",
+      id: 1,
+      rank: "client",
+    });
   }
 }

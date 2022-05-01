@@ -17,11 +17,14 @@ export interface MessageInfo {
 export abstract class NetworkAdapterApi {
   protected readyResolver = new Resolver<void>();
 
-  onMessage!: (messageInfo: MessageInfo) => void;
+  onMessage?: (messageInfo: MessageInfo) => void;
+  onConnection?: (connectionInfo: ConnectionInfo) => void;
+  onDisconnection?: (connectionInfo: ConnectionInfo) => void;
 
   abstract sendMessageToAll(messageData: string): void;
   abstract sendMessageById(targetId: ConnectionId, messageData: string): void;
   abstract sendMessageByRank(targetRank: string, messageData: string): void;
+
   abstract getConnectionList(): ConnectionInfo[];
 
   public isReady(): Promise<void> {

@@ -8,7 +8,12 @@ import {
   EntityRequest,
   NetworkAdapterApi,
   SimpleEcr,
-  PlayerAction, WorldStateSnapshot,
+  PlayerAction,
+  WorldStateSnapshot,
+  SimpleNetworkMessageMapper,
+  SimpleSerializer,
+  OnConnectionMessage,
+  OnDisconnectionMessage,
 } from "@worldscapes/common";
 import {
   SimpleClientAuth,
@@ -47,7 +52,17 @@ export class AppComponent implements OnInit {
           new SimpleClientAuth({ id: "2" }),
       "localhost"
       );
+
+      const mapper = new SimpleNetworkMessageMapper(
+          this.adapter,
+          new SimpleSerializer()
+      );
+
+      mapper.addMessageHandler(OnConnectionMessage, console.log);
+      mapper.addMessageHandler(OnDisconnectionMessage, console.log);
+
       await this.adapter.isReady();
+
 
       this.ecr = new SimpleEcr();
 
@@ -69,7 +84,7 @@ export class AppComponent implements OnInit {
 
       this.client = new SimpleEngineClient(
           new SimpleClientSimulation(this.ecr),
-          new SimpleNetworkClient(this.adapter)
+          new SimpleNetworkClient(mapper)
       );
       this.client.start();
 
