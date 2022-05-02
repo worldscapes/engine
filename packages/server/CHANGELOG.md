@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.1.0-beta.13](https://github.com/worldscapes/engine/compare/v0.1.0-beta.12...v0.1.0-beta.13) (2022-05-02)
+
+
+### Features
+
+* made Mapper additional abstraction layer between network client/server and Adapter ([7cb674b](https://github.com/worldscapes/engine/commit/7cb674b6aeccd7713e7a84f28718fd94141fbe05))
+
+
+
+
+
 # [0.1.0-beta.11](https://github.com/worldscapes/engine/compare/v0.1.0-beta.10...v0.1.0-beta.11) (2022-04-18)
 
 
