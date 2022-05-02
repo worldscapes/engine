@@ -9,6 +9,11 @@ export class LocalClientNetworkAdapter extends NetworkAdapterApi {
 
     if (serverAdapter) {
       serverAdapter.registerClient(this);
+      this.onConnection?.({
+        playerId: "0",
+        id: 1,
+        rank: "server",
+      });
     }
   }
 

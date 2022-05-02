@@ -2,7 +2,10 @@ import {AuthClientApi, ConnectionInfo, NetworkAdapterApi} from "@worldscapes/com
 import * as crypto from "crypto-js";
 
 export class WebsocketClientNetworkAdapter extends NetworkAdapterApi {
+
   protected socket!: WebSocket;
+
+  protected connectionList: ConnectionInfo[] = [];
 
   constructor(
       readonly auth: AuthClientApi,
@@ -24,9 +27,27 @@ export class WebsocketClientNetworkAdapter extends NetworkAdapterApi {
 
     this.socket.addEventListener("open", () => {
       this.readyResolver.resolve();
+      const connectionInfo = {
+        playerId: "0",
+        id: 1,
+        rank: "server",
+      };
+      this.connectionList.push(connectionInfo);
+      this.onConnection?.(connectionInfo);
     });
+
+    this.socket.addEventListener("close", () => {
+      this.onDisconnection?.(this.connectionList[0]);
+      this.connectionList = [];
+    });
+
+    this.socket.addEventListener("error", () => {
+      this.onDisconnection?.(this.connectionList[0]);
+      this.connectionList = [];
+    });
+
     this.socket.addEventListener("message", (messageEvent) => {
-      this.onMessage({
+      this.onMessage?.({
         messageText: messageEvent.data,
         connectionInfo: this.getConnectionList()[0],
       });
@@ -34,13 +55,7 @@ export class WebsocketClientNetworkAdapter extends NetworkAdapterApi {
   }
 
   getConnectionList(): ConnectionInfo[] {
-    return [
-      {
-        playerId: "0",
-        id: 1,
-        rank: "server",
-      },
-    ];
+    return this.connectionList;
   }
 
   sendMessageById(targetId: number, messageData: string): void {

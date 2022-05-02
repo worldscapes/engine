@@ -1,43 +1,33 @@
 import {
-  NetworkAdapterApi,
-  NetworkMessageMapper,
   UpdatedSnapshotMessage,
   PlayerAction,
   PlayerId,
   PlayerInputMessage,
-  WorldStateSnapshot, NetworkSerializerApi, SimpleSerializer
+  WorldStateSnapshot,
+  NetworkMessageMapperApi, ConnectionInfo
 } from "@worldscapes/common";
 import { NetworkServerApi } from "../server-network.api";
 
 export class SimpleNetworkServer extends NetworkServerApi {
   protected accumulatedPlayerInput: Record<PlayerId, PlayerAction[]> = {};
 
-  protected mapper = new NetworkMessageMapper();
 
   constructor(
-      protected adapter: NetworkAdapterApi,
-      protected serializer: NetworkSerializerApi = new SimpleSerializer(),
+      protected mapper: NetworkMessageMapperApi,
   ) {
     super();
 
     this.mapper.addMessageHandler(
       PlayerInputMessage,
-      (message, connectionInfo) => {
-        this.accumulatedPlayerInput[connectionInfo.playerId] =
-          this.accumulatedPlayerInput[connectionInfo.playerId] ?? [];
-        this.accumulatedPlayerInput[connectionInfo.playerId].push(...message.input);
-      }
+      this.accumulatePlayerInput.bind(this)
     );
 
-    adapter.onMessage = ({ messageText, connectionInfo }) => {
-      this.mapper.handleMessage(this.serializer.parse(messageText), connectionInfo);
-    };
   }
 
   sendSnapshot(snapshot: WorldStateSnapshot): void {
-    this.adapter.sendMessageByRank(
+    this.mapper.sendMessage(
       "client",
-      this.serializer.stringify(new UpdatedSnapshotMessage(snapshot))
+      new UpdatedSnapshotMessage(snapshot)
     );
   }
 
@@ -45,5 +35,14 @@ export class SimpleNetworkServer extends NetworkServerApi {
     const input = this.accumulatedPlayerInput;
     this.accumulatedPlayerInput = {};
     return input;
+  }
+
+  protected accumulatePlayerInput(message: PlayerInputMessage, connectionInfo: ConnectionInfo): void {
+
+    if (!this.accumulatedPlayerInput[connectionInfo.playerId]) {
+      this.accumulatedPlayerInput[connectionInfo.playerId] = [];
+    }
+
+    this.accumulatedPlayerInput[connectionInfo.playerId].push(...message.input);
   }
 }

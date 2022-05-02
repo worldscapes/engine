@@ -9,7 +9,7 @@ import {
   PlayerInfo,
   PlayerActionTools,
   OwnedComponent,
-  isSet
+  isSet, SimpleNetworkMessageMapper, SimpleSerializer, OnConnectionMessage, OnDisconnectionMessage
 } from "@worldscapes/common";
 import {SimpleEngineServer, SimpleNetworkServer, SimpleServerAuth, SimpleServerSimulation, WebsocketServerNetworkAdapter} from "@worldscapes/server";
 import {AddOneCardAction, CardShuffle, TEST_CARDS} from "@worldscapes/testing-common";
@@ -106,6 +106,14 @@ async function init() {
   await serverAdapter.isReady();
   console.log("Network adapter is ready.");
 
+  const mapper = new SimpleNetworkMessageMapper(
+    serverAdapter,
+    new SimpleSerializer()
+  );
+
+  mapper.addMessageHandler(OnConnectionMessage, console.log);
+  mapper.addMessageHandler(OnDisconnectionMessage, console.log);
+
   serverAdapter.sendMessageToAll("{ 'test' : 123 }");
 
   // serverAdapter.sendMessageByRank('client', JSON.stringify({someTestMessage: 1}));
@@ -114,7 +122,7 @@ async function init() {
   console.log("Starting Server Engine.");
   new SimpleEngineServer(
     new SimpleServerSimulation(ecr, players),
-    new SimpleNetworkServer(serverAdapter),
+    new SimpleNetworkServer(mapper),
   ).start();
 
   console.log("Successfully initialized.");
