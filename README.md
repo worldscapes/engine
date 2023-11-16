@@ -4,6 +4,6 @@ Worldscapes Engine is data-driven framework for game simulation. It provides sca
 
 # Read more
 
-If you want to know more, you can read Engine description and documentation [here](https://github.com/worldscapes/engine/wiki)
+If you want to know more, take a look at Engine [documentation](https://github.com/worldscapes/engine/wiki).
 
-Also, you can find POC test project for Engine [here](https://github.com/SFilinsky/worldscapes-arkanoid)
+If you want to see it in action, ou can take a look at example [Arkanoid game](https://github.com/SFilinsky/worldscapes-arkanoid).
